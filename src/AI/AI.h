@@ -43,7 +43,8 @@ namespace AI{
          * @param next
          * @return
          */
-        auto getNextAction(const communication::messages::broadcast::Next &next) const -> communication::messages::request::DeltaRequest;
+        auto getNextAction(const communication::messages::broadcast::Next &next) const ->
+            std::optional<communication::messages::request::DeltaRequest>;
 
     private:
         State currentState;

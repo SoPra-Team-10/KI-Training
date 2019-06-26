@@ -2,6 +2,7 @@
 // Created by timluchterhand on 26.06.19.
 //
 
+#include <SopraGameLogic/conversions.h>
 #include "AI.h"
 namespace AI{
     AI::AI(const std::shared_ptr<gameModel::Environment>& env, gameModel::TeamSide mySide) :
@@ -13,7 +14,7 @@ namespace AI{
     }
 
     auto AI::getFeatureVec() const -> std::array<double, FEATURE_VEC_LEN> {
-        std::array<double, 120> ret = {};
+        std::array<double, FEATURE_VEC_LEN> ret = {};
         auto insertTeam = [this](gameModel::TeamSide side, std::array<double, 120>::iterator &it){
             auto &usedPlayers = side == gameModel::TeamSide::LEFT ? currentState.playersUsedLeft : currentState.playersUsedRight;
             auto &availableFans = side == gameModel::TeamSide::LEFT ? currentState.availableFansLeft : currentState.availableFansRight;
@@ -74,7 +75,18 @@ namespace AI{
     }
 
     auto AI::getNextAction(const communication::messages::broadcast::Next &next) const ->
-        communication::messages::request::DeltaRequest {
+        std::optional<communication::messages::request::DeltaRequest> {
 
+        if(gameLogic::conversions::idToSide(next.getEntityId()) != mySide){
+            return std::nullopt;
+        }
+
+        switch (next.getTurnType()){
+            case communication::messages::types::TurnType::MOVE:
+                break;
+            case communication::messages::types::TurnType::ACTION:break;
+            case communication::messages::types::TurnType::FAN:break;
+            case communication::messages::types::TurnType::REMOVE_BAN:break;
+        }
     }
 }
