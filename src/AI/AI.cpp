@@ -5,13 +5,32 @@
 #include <SopraGameLogic/conversions.h>
 #include "AI.h"
 namespace ai{
+    constexpr auto winReward = 1;
+    constexpr auto goalReward = 0.2;
     AI::AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
            double discountRate) : currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
             learningRate(learningRate), discountRate(discountRate) {}
 
-    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &) {
+    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
         double reward = 0;
+        auto opponentSide = mySide == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
+        if(winningSide.has_value()){
+            if(winningSide != mySide){
+                reward = -winReward;
+            } else {
+                reward = winReward;
+            }
+        } else {
+            auto myDiff = state.env->getTeam(mySide)->score - currentState.env->getTeam(mySide)->score;
+            auto opponentDiff = state.env->getTeam(opponentSide)->score - currentState.env->getTeam(opponentSide)->score;
+            if(myDiff >= gameController::GOAL_POINTS){
+                reward = goalReward;
+            } else if(opponentDiff >= gameController::GOAL_POINTS){
+                reward = -goalReward;
+            }
+        }
+
         auto tdErrorFun = [&reward, &state, this](const std::array<double, 1> &out, const std::array<double, 1> &){
             return reward + discountRate * stateEstimator.forward(state.getFeatureVec(mySide))[0] - out[0];
         };
