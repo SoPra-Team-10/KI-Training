@@ -124,7 +124,7 @@ namespace gameHandling{
                 bannedPlayers.emplace_back(player);
                 if(!firstSideDisqualified.has_value() &&
                    environment->getTeam(player)->numberOfBannedMembers() > MAX_BAN_COUNT) {
-                    firstSideDisqualified = getSide(player);
+                    firstSideDisqualified = environment->getTeam(player)->side;
                 }
             }
         };
@@ -169,6 +169,7 @@ namespace gameHandling{
 
                         auto res = bShot.execute();
                         addFouls(res.second, player);
+                        getUsedPlayers(side).emplace(player->id);
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
@@ -214,6 +215,7 @@ namespace gameHandling{
                             }
                         }
 
+                        getUsedPlayers(side).emplace(player->id);
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
@@ -402,6 +404,10 @@ namespace gameHandling{
                             if(!snitchCaught){
                                 log.debug("Failed to catch snitch");
                             }
+                        }
+
+                        if(phaseManager.playerUsed(player)){
+                            getUsedPlayers(side).emplace(player->id);
                         }
 
                         if(snitchCaught){
@@ -595,6 +601,8 @@ namespace gameHandling{
         roundNumber++;
         phaseManager.reset();
         environment->removeDeprecatedShit();
+        playersUsedRight.clear();
+        playersUsedLeft.clear();
 
         if(environment->team1->numberOfBannedMembers() > MAX_BAN_COUNT &&
             environment->team2->numberOfBannedMembers() > MAX_BAN_COUNT) {
@@ -659,11 +667,26 @@ namespace gameHandling{
         }
     }
 
-    auto Game::getSide(const std::shared_ptr<const gameModel::Player> &player) const -> gameModel::TeamSide {
-        return environment->team1->hasMember(player) ? gameModel::TeamSide::LEFT : gameModel::TeamSide::RIGHT;
+    auto Game::getState() const -> AI::State{
+        using Ftype = communication::messages::types::FanType;
+        std::array<unsigned int, 5> availableFansLeft = {};
+        std::array<unsigned int, 5> availableFansRight = {};
+        availableFansLeft[0] = environment->getTeam(gameModel::TeamSide::LEFT)->fanblock.getUses(Ftype::ELF) - phaseManager.interferencesUsedLeft(Ftype::ELF);
+        availableFansLeft[1] = environment->getTeam(gameModel::TeamSide::LEFT)->fanblock.getUses(Ftype::GOBLIN) - phaseManager.interferencesUsedLeft(Ftype::GOBLIN);
+        availableFansLeft[2] = environment->getTeam(gameModel::TeamSide::LEFT)->fanblock.getUses(Ftype::TROLL) - phaseManager.interferencesUsedLeft(Ftype::TROLL);
+        availableFansLeft[3] = environment->getTeam(gameModel::TeamSide::LEFT)->fanblock.getUses(Ftype::NIFFLER) - phaseManager.interferencesUsedLeft(Ftype::NIFFLER);
+        availableFansLeft[4] = environment->getTeam(gameModel::TeamSide::LEFT)->fanblock.getUses(Ftype::WOMBAT) - phaseManager.interferencesUsedLeft(Ftype::WOMBAT);
+
+        availableFansRight[0] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::ELF) - phaseManager.interferencesUsedRight(Ftype::ELF);
+        availableFansRight[1] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::GOBLIN) - phaseManager.interferencesUsedRight(Ftype::GOBLIN);
+        availableFansRight[2] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::TROLL) - phaseManager.interferencesUsedRight(Ftype::TROLL);
+        availableFansRight[3] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::NIFFLER) - phaseManager.interferencesUsedRight(Ftype::NIFFLER);
+        availableFansRight[4] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::WOMBAT) - phaseManager.interferencesUsedRight(Ftype::WOMBAT);
+        return {environment->clone(), roundNumber, currentPhase, overTimeState, overTimeCounter, goalScored, playersUsedLeft, playersUsedRight, availableFansLeft, availableFansRight};
     }
 
-    auto Game::getState() const -> std::shared_ptr<gameModel::Environment> {
-        return environment->clone();
+    auto Game::getUsedPlayers(const gameModel::TeamSide &side) ->
+        std::unordered_set<communication::messages::types::EntityId> & {
+        return side == gameModel::TeamSide::LEFT ? playersUsedLeft : playersUsedRight;
     }
 }
