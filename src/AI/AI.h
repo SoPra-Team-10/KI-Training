@@ -17,7 +17,8 @@
 namespace ai {
     class AI {
     public:
-        AI(const std::shared_ptr<gameModel::Environment>& env, gameModel::TeamSide mySide);
+        AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
+           double discountRate);
 
         /**
          * Updates the internal State
@@ -37,6 +38,8 @@ namespace ai {
         aiTools::State currentState;
         const gameModel::TeamSide mySide;
         ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
+        double learningRate;
+        double discountRate;
 
         /**
          * Computes a feature vextor from the given state

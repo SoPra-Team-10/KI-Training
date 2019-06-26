@@ -10,8 +10,9 @@ communication::Communicator::Communicator(const communication::messages::broadca
                                           const communication::messages::request::TeamConfig &rightTeamConfig,
                                           util::Logging &log)
                                           : game{matchConfig, leftTeamConfig, rightTeamConfig, {}, {}/*TODO*/, log},
-                                          ais{std::make_pair(ai::AI{game.environment, gameModel::TeamSide::LEFT},
-                                             ai::AI{game.environment, gameModel::TeamSide::RIGHT})}, log{log} {
+                                            ais{std::make_pair(ai::AI{game.environment, gameModel::TeamSide::LEFT},
+                                                               ai::AI{game.environment, gameModel::TeamSide::RIGHT}, 0,
+                                                               0)}, log{log} {
 
     while (!game.winEvent.has_value()) {
         ais.first.update(game.getState(), <#initializer#>);

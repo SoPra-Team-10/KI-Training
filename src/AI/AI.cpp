@@ -5,11 +5,18 @@
 #include <SopraGameLogic/conversions.h>
 #include "AI.h"
 namespace ai{
-    AI::AI(const std::shared_ptr<gameModel::Environment>& env, gameModel::TeamSide mySide) :
-        currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
-                     0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity){}
+    AI::AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
+           double discountRate) : currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
+                     0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
+            learningRate(learningRate), discountRate(discountRate) {}
 
     void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
+        double reward = 0;
+        auto tdErrorFun = [&reward, &state, this](const std::array<double, 1> &out, const std::array<double, 1> &){
+            return reward + discountRate * stateEstimator.forward(state.getFeatureVec(mySide))[0] - out[0];
+        };
+
+        stateEstimator.train({currentState.getFeatureVec(mySide)}, {{0}}, std::numeric_limits<double>::infinity(), tdErrorFun, learningRate);
         this->currentState = state;
     }
 
