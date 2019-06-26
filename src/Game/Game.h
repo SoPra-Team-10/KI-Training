@@ -5,7 +5,6 @@
 #ifndef SERVER_GAME_H
 #define SERVER_GAME_H
 
-#include <SopraNetwork/Listener.hpp>
 #include <SopraMessages/MatchConfig.hpp>
 #include <SopraMessages/Next.hpp>
 #include <SopraMessages/TeamConfig.hpp>
@@ -36,7 +35,7 @@ namespace gameHandling {
              communication::messages::request::TeamFormation teamFormation2,
              util::Logging &log);
 
-        mutable std::optional<std::tuple<gameModel::TeamSide, communication::messages::types::VictoryReason>> winEvent;
+        mutable std::optional<std::pair<gameModel::TeamSide, communication::messages::types::VictoryReason>> winEvent;
 
         /**
          * Gets the next actor to make a move. If the actor is a player, the timeout timer is started

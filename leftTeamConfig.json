@@ -1,0 +1,53 @@
+{
+    "name": "Left",
+    "motto": "Auch",
+    "colors": {
+        "primary": "FFFFFF",
+        "secondary": "000000"
+    },
+    "image": "(string/base64/png)",
+    "fans": {
+        "goblins": 1,
+        "trolls": 1,
+        "elves": 1,
+        "nifflers": 1,
+        "wombats": 3
+    },
+    "players": {
+        "seeker": {
+            "name": "abcd",
+            "broom": "tinderblast",
+            "sex": "m"
+        },
+        "keeper": {
+            "name": "abcd",
+            "broom": "cleansweep11",
+            "sex": "m"
+        },
+        "chaser1": {
+            "name": "abcd",
+            "broom": "comet260",
+            "sex": "m"
+        },
+        "chaser2": {
+            "name": "abcd",
+            "broom": "nimbus2001",
+            "sex": "m"
+        },
+        "chaser3": {
+            "name": "abcd",
+            "broom": "firebolt",
+            "sex": "m"
+        },
+        "beater1": {
+            "name": "abcd",
+            "broom": "tinderblast",
+            "sex": "m"
+        },
+        "beater2": {
+            "name": "abcd",
+            "broom": "tinderblast",
+            "sex": "m"
+        }
+    }
+}

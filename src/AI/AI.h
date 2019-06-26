@@ -15,7 +15,8 @@
 
 namespace ai {
     constexpr auto FEATURE_VEC_LEN = 122;
-    struct State{
+    class State {
+    public:
         std::shared_ptr<const gameModel::Environment> env;
         unsigned int roundNumber;
         communication::messages::types::PhaseType currentPhase;
