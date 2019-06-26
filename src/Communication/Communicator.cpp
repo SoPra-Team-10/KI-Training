@@ -3,20 +3,22 @@
 //
 
 #include <SopraGameLogic/conversions.h>
+#include <SopraAITools/AITools.h>
 #include "Communicator.h"
 
 communication::Communicator::Communicator(const communication::messages::broadcast::MatchConfig &matchConfig,
                                           const communication::messages::request::TeamConfig &leftTeamConfig,
                                           const communication::messages::request::TeamConfig &rightTeamConfig,
                                           util::Logging &log)
-                                          : game{matchConfig, leftTeamConfig, rightTeamConfig, {}, {}/*TODO*/, log},
-                                            ais{std::make_pair(ai::AI{game.environment, gameModel::TeamSide::LEFT},
-                                                               ai::AI{game.environment, gameModel::TeamSide::RIGHT}, 0,
-                                                               0)}, log{log} {
+                                          : game{matchConfig, leftTeamConfig, rightTeamConfig,
+                                                 aiTools::getTeamFormation(gameModel::TeamSide::LEFT),
+                                                 aiTools::getTeamFormation(gameModel::TeamSide::RIGHT), log},
+                                          ais{std::make_pair(ai::AI{game.environment, gameModel::TeamSide::LEFT, 0, 0},
+                                             ai::AI{game.environment, gameModel::TeamSide::RIGHT, 0, 0})}, log{log} {
 
     while (!game.winEvent.has_value()) {
-        ais.first.update(game.getState(), <#initializer#>);
-        ais.second.update(game.getState(), <#initializer#>);
+        ais.first.update(game.getState(), std::nullopt);
+        ais.second.update(game.getState(), std::nullopt);
 
         auto next = game.getNextAction();
 
@@ -40,7 +42,11 @@ communication::Communicator::Communicator(const communication::messages::broadca
             }
         }
     }
+    auto winTuple = game.winEvent.value();
+
+    ais.first.update(game.getState(), winTuple.first);
+    ais.second.update(game.getState(), winTuple.first);
 
     log.info("Game finished:");
-    log.info(messages::types::toString(game.winEvent.value().second));
+    log.info(messages::types::toString(winTuple.second));
 }

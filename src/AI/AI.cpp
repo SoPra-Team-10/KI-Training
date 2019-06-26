@@ -10,7 +10,7 @@ namespace ai{
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
             learningRate(learningRate), discountRate(discountRate) {}
 
-    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
+    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &) {
         double reward = 0;
         auto tdErrorFun = [&reward, &state, this](const std::array<double, 1> &out, const std::array<double, 1> &){
             return reward + discountRate * stateEstimator.forward(state.getFeatureVec(mySide))[0] - out[0];
