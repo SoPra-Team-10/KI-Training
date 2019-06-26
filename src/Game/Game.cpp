@@ -51,7 +51,6 @@ namespace gameHandling{
                         return {EntityId::BLUDGER2, TurnType::MOVE, 0};
                     default:
                         throw std::runtime_error("Fatal Error! Inconsistent game state!");
-                        return {};
                 }
 
             case PhaseType::PLAYER_PHASE:
@@ -68,7 +67,6 @@ namespace gameHandling{
                     }
                 } catch (std::exception &e){
                     throw std::runtime_error(e.what());
-                    return {};
                 }
             case PhaseType::FAN_PHASE:
                 try {
@@ -90,7 +88,6 @@ namespace gameHandling{
                     }
                 } catch (std::exception &e){
                     throw std::runtime_error(e.what());
-                    return {};
                 }
             case PhaseType::UNBAN_PHASE:
                 try {
@@ -108,11 +105,9 @@ namespace gameHandling{
                     }
                 } catch (std::exception &e){
                     throw std::runtime_error(e.what());
-                    return {};
                 }
             default:
                 throw std::runtime_error("Fatal error, inconsistent game state!");
-                return {};
         }
     }
 
@@ -173,7 +168,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else {
                     log.warn("Bludger shot has insufficient information");
@@ -219,7 +213,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else{
                     log.warn("Quaffle throw has insufficient information");
@@ -248,7 +241,6 @@ namespace gameHandling{
                     return true;
                 } catch (std::exception &e){
                     throw std::runtime_error(e.what());
-                    return false;
                 }
             }
             case DeltaType::TROLL_ROAR:{
@@ -269,7 +261,6 @@ namespace gameHandling{
                     return true;
                 } catch (std::exception &e){
                     throw std::runtime_error(e.what());
-                    return false;
                 }
             }
             case DeltaType::ELF_TELEPORTATION:{
@@ -297,7 +288,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else {
                     log.warn("Teleport request has insufficient information");
@@ -328,7 +318,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else {
                     log.warn("Ranged attack request has insufficient information");
@@ -348,7 +337,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
 
                 } else {
@@ -391,7 +379,6 @@ namespace gameHandling{
                                 snitchCaught = true;
                             } else {
                                 throw std::runtime_error(std::string{"Unexpected action result"});
-                                return false;
                             }
                         }
 
@@ -419,7 +406,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e) {
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else {
                     log.warn("Move request has insufficient information");
@@ -481,7 +467,6 @@ namespace gameHandling{
                         return true;
                     } catch (std::exception &e) {
                         throw std::runtime_error(e.what());
-                        return false;
                     }
 
                 } else {
@@ -514,13 +499,11 @@ namespace gameHandling{
                         addFouls(res.second, player);
                         if(res.first.size() > 1){
                             throw std::runtime_error(std::string{"Unexpected action result"});
-                            return false;
                         }
 
                         return true;
                     } catch(std::exception &e){
                         throw std::runtime_error(e.what());
-                        return false;
                     }
                 } else {
                     log.warn("Wrest request has insufficient information");
@@ -554,13 +537,11 @@ namespace gameHandling{
 
                 if(!bludger){
                     throw std::runtime_error(std::string{"We done fucked it up!"});
-                    return;
                 }
 
                 auto res = gameController::moveBludger(bludger, environment);
             } catch (std::exception &e){
                 throw std::runtime_error(e.what());
-                return;
             }
 
         } else if (entityId == communication::messages::types::EntityId::SNITCH) {
@@ -568,7 +549,6 @@ namespace gameHandling{
             auto snitch = std::dynamic_pointer_cast<gameModel::Snitch>(ball);
             if(!snitch){
                 throw std::runtime_error(std::string{"We done fucked it up!"});
-                return;
             }
 
             bool caught = gameController::moveSnitch(snitch, environment, overTimeState);
@@ -576,7 +556,6 @@ namespace gameHandling{
                 auto catcher = environment->getPlayer(environment->snitch->position);
                 if(!catcher.has_value()){
                     throw std::runtime_error(std::string{"Fatal error! Snitch did not collide with a seeker"});
-                    return;
                 }
 
                 auto winningTeam = getVictoriousTeam(catcher.value());

@@ -36,6 +36,7 @@ of docker.
  * [SopraGameLogic](https://github.com/SoPra-Team-10/GameLogic)
  * [SopraMessages](https://github.com/SoPra-Team-10/Messages)
  * [SopraUtil](https://github.com/SoPra-Team-10/Util)
+ * [SopraAITools](https://github.com/SoPra-Team-10/AITools)
  * [MLP](https://github.com/aul12/MLP)
  * Either a POSIX-Compliant OS or Cygwin (to use pthreads)
  * Optional: Google Tests and Google Mock for Unit-Tests
@@ -63,6 +64,7 @@ you can now run the program by executing the created `KiTraining` file:
  * [SopraGameLogic](https://github.com/SoPra-Team-10/GameLogic)
  * [SopraMessages](https://github.com/SoPra-Team-10/Messages)
  * [SopraUtil](https://github.com/SoPra-Team-10/Util)
+ * [SopraAITools](https://github.com/SoPra-Team-10/AITools)
  * [MLP](https://github.com/aul12/MLP)
  * [nlohmann::json](https://github.com/nlohmann/json)
 
