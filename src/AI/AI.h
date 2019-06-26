@@ -35,10 +35,10 @@ namespace ai {
         auto getNextAction(const communication::messages::broadcast::Next &next) const ->
             std::optional<communication::messages::request::DeltaRequest>;
 
+        ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
     private:
         aiTools::State currentState;
         const gameModel::TeamSide mySide;
-        ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
         double learningRate;
         double discountRate;
         util::Logging log;

@@ -8,8 +8,9 @@ namespace ai{
     constexpr auto winReward = 1;
     constexpr auto goalReward = 0.2;
     AI::AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
-           double discountRate, util::Logging log) : currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
-                     0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
+           double discountRate, util::Logging log) : stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
+           currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
+                     0, false, {}, {}, {}, {}}, mySide(mySide),
                                                      learningRate(learningRate), discountRate(discountRate), log(log) {}
 
     void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {

@@ -49,8 +49,12 @@ int main(int argc, char *argv[]) {
     auto rightTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(rightTeamConfigPath);
 
     util::Logging log{std::cout, 4};
-    
-    communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate, discountRate};
+
+    for (auto epoch = 0; epoch < 10; ++epoch) {
+        communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
+                                                 discountRate, epoch};
+        log.warn("Epoch finished");
+    }
 
     return 0;
 }

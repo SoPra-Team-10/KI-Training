@@ -122,6 +122,9 @@ namespace gameHandling{
 
             case TeamState::BothEmpty:
                 return {};
+
+            default:
+                throw std::runtime_error{"Enum out of bounds"};
         }
 
         return broadcast::Next{nextInter, types::TurnType::FAN, timeouts.fanTurn};

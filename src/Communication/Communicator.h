@@ -15,7 +15,8 @@ namespace communication {
         Communicator(const messages::broadcast::MatchConfig &matchConfig,
                 const messages::request::TeamConfig &leftTeamConfig,
                 const messages::request::TeamConfig &rightTeamConfig,
-                util::Logging &log, double learningRate, double discountRate);
+                util::Logging &log, double learningRate, double discountRate,
+                int epoch);
 
     private:
         gameHandling::Game game;
