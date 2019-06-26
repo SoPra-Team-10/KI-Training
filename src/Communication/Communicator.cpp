@@ -9,12 +9,14 @@
 communication::Communicator::Communicator(const communication::messages::broadcast::MatchConfig &matchConfig,
                                           const communication::messages::request::TeamConfig &leftTeamConfig,
                                           const communication::messages::request::TeamConfig &rightTeamConfig,
-                                          util::Logging &log)
+                                          util::Logging &log, double learningRate, double discountRate)
                                           : game{matchConfig, leftTeamConfig, rightTeamConfig,
                                                  aiTools::getTeamFormation(gameModel::TeamSide::LEFT),
                                                  aiTools::getTeamFormation(gameModel::TeamSide::RIGHT), log},
-                                          ais{std::make_pair(ai::AI{game.environment, gameModel::TeamSide::LEFT, 0, 0},
-                                             ai::AI{game.environment, gameModel::TeamSide::RIGHT, 0, 0})}, log{log} {
+                                            ais{std::make_pair(
+                                                    ai::AI{game.environment, gameModel::TeamSide::LEFT, learningRate, discountRate, log},
+                                                    ai::AI{game.environment, gameModel::TeamSide::RIGHT, learningRate, discountRate, log})},
+                                                    log{log} {
 
     while (!game.winEvent.has_value()) {
         ais.first.update(game.getState(), std::nullopt);

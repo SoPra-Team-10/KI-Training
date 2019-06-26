@@ -13,12 +13,13 @@
 #include <SopraMessages/Next.hpp>
 #include <SopraMessages/DeltaRequest.hpp>
 #include <SopraAITools/AITools.h>
+#include <SopraUtil/Logging.hpp>
 
 namespace ai {
     class AI {
     public:
         AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
-           double discountRate);
+           double discountRate, util::Logging log);
 
         /**
          * Updates the internal State
@@ -40,6 +41,7 @@ namespace ai {
         ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
         double learningRate;
         double discountRate;
+        util::Logging log;
 
         /**
          * Computes a feature vextor from the given state

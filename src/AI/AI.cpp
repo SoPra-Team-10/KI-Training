@@ -8,9 +8,9 @@ namespace ai{
     constexpr auto winReward = 1;
     constexpr auto goalReward = 0.2;
     AI::AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
-           double discountRate) : currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
+           double discountRate, util::Logging log) : currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
-            learningRate(learningRate), discountRate(discountRate) {}
+                                                     learningRate(learningRate), discountRate(discountRate), log(log) {}
 
     void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
         double reward = 0;
@@ -32,10 +32,14 @@ namespace ai{
         }
 
         auto tdErrorFun = [&reward, &state, this](const std::array<double, 1> &out, const std::array<double, 1> &){
-            return reward + discountRate * stateEstimator.forward(state.getFeatureVec(mySide))[0] - out[0];
+            auto tdError = reward + discountRate * stateEstimator.forward(state.getFeatureVec(mySide))[0] - out[0];
+            log.debug(std::string("tdError: ") + std::to_string(tdError));
+            return tdError;
         };
 
-        stateEstimator.train({currentState.getFeatureVec(mySide)}, {{0}}, std::numeric_limits<double>::infinity(), tdErrorFun, learningRate);
+        auto stringSide = mySide == gameModel::TeamSide::LEFT ? "left: " : "right: ";
+        auto loss = stateEstimator.train({currentState.getFeatureVec(mySide)}, {{0}}, std::numeric_limits<double>::infinity(), tdErrorFun, learningRate);
+        log.info(std::string("Loss ") + stringSide + std::to_string(loss));
         this->currentState = state;
     }
 

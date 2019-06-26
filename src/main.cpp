@@ -32,14 +32,16 @@ auto readFromFileToJson(const std::string &fname) -> T {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        std::cerr << "Usage: KiTraining matchConfig.json leftTeamConfig.json rightTeamConfig.json" << std::endl;
+    if (argc != 6) {
+        std::cerr << "Usage: KiTraining matchConfig.json leftTeamConfig.json rightTeamConfig.json learningRate discountRate" << std::endl;
         std::exit(1);
     }
 
     std::string matchConfigPath{argv[1]};
     std::string leftTeamConfiPath{argv[2]};
     std::string rightTeamConfigPath{argv[3]};
+    auto learningRate = std::stod(argv[4]);
+    auto discountRate = std::stod(argv[5]);
 
 
     auto matchConfig = readFromFileToJson<communication::messages::broadcast::MatchConfig>(matchConfigPath);
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]) {
 
     util::Logging log{std::cout, 4};
     
-    communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log};
+    communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate, discountRate};
 
     return 0;
 }
