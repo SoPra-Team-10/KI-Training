@@ -14,8 +14,8 @@ communication::Communicator::Communicator(const communication::messages::broadca
                                              ai::AI{game.environment, gameModel::TeamSide::RIGHT})}, log{log} {
 
     while (!game.winEvent.has_value()) {
-        ais.first.update(game.getState());
-        ais.second.update(game.getState());
+        ais.first.update(game.getState(), <#initializer#>);
+        ais.second.update(game.getState(), <#initializer#>);
 
         auto next = game.getNextAction();
 

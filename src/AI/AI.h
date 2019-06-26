@@ -23,7 +23,7 @@ namespace ai {
          * Updates the internal State
          * @param state new State
          */
-        void update(const aiTools::State &state);
+        void update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide);
 
         /**
          * Returns the AIs next action

@@ -9,7 +9,7 @@ namespace ai{
         currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity){}
 
-    void AI::update(const aiTools::State &state) {
+    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
         this->currentState = state;
     }
 
