@@ -88,5 +88,6 @@ namespace AI{
             case communication::messages::types::TurnType::FAN:break;
             case communication::messages::types::TurnType::REMOVE_BAN:break;
         }
+        return {};
     }
 }

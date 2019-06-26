@@ -24,7 +24,7 @@ set(SOURCES
         ${CMAKE_SOURCE_DIR}/src/Game/ConfigCheck.cpp
         ${CMAKE_SOURCE_DIR}/src/AI/AI.cpp)
 
-set(LIBS pthread stdc++fs SopraGameLogic SopraMessages SopraUtil)
+set(LIBS pthread stdc++fs SopraGameLogic SopraMessages SopraUtil Mlp)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_executable(${PROJECT_NAME} src/main.cpp ${SOURCES})
