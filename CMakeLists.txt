@@ -25,7 +25,7 @@ set(SOURCES
         ${CMAKE_SOURCE_DIR}/src/AI/AI.cpp
         ${CMAKE_SOURCE_DIR}/src/Communication/Communicator.cpp)
 
-set(LIBS pthread stdc++fs SopraGameLogic SopraMessages SopraUtil Mlp)
+set(LIBS pthread stdc++fs SopraGameLogic SopraMessages SopraUtil SopraAITools Mlp)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_executable(${PROJECT_NAME} src/main.cpp ${SOURCES})
