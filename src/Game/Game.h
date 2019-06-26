@@ -18,6 +18,8 @@
 #include "GameTypes.h"
 #include <SopraUtil/Timer.h>
 #include "PhaseManager.h"
+#include <unordered_set>
+#include <AI/AI.h>
 
 namespace gameHandling {
     constexpr auto SNITCH_SPAWN_ROUND = 10;
@@ -60,7 +62,7 @@ namespace gameHandling {
          * Gets a copy of the current game state
          * @return
          */
-        auto getState() const -> std::shared_ptr<gameModel::Environment>;
+        auto getState() const -> AI::State;
 
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases
@@ -77,13 +79,10 @@ namespace gameHandling {
         bool goalScored = false;
         std::deque<std::shared_ptr<gameModel::Player>> bannedPlayers = {};
         std::optional<gameModel::TeamSide> firstSideDisqualified = std::nullopt;
+        std::unordered_set<communication::messages::types::EntityId> playersUsedLeft = {};
+        std::unordered_set<communication::messages::types::EntityId> playersUsedRight = {};
 
-        /**
-         * Gets the side of the given Team
-         * @param player
-         * @return
-         */
-        auto getSide(const std::shared_ptr<const gameModel::Player> &player) const -> gameModel::TeamSide;
+        auto getUsedPlayers(const gameModel::TeamSide &side) -> std::unordered_set<communication::messages::types::EntityId>&;
 
         /**
          * gets the winning Team and the reason for winning when the snitch has been caught.
