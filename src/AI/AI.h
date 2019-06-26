@@ -41,7 +41,7 @@ namespace ai {
         const gameModel::TeamSide mySide;
         double learningRate;
         double discountRate;
-        util::Logging log;
+        mutable util::Logging log;
 
         /**
          * Computes a feature vextor from the given state

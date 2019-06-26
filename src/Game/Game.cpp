@@ -661,6 +661,7 @@ namespace gameHandling{
         availableFansRight[2] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::TROLL) - phaseManager.interferencesUsedRight(Ftype::TROLL);
         availableFansRight[3] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::NIFFLER) - phaseManager.interferencesUsedRight(Ftype::NIFFLER);
         availableFansRight[4] = environment->getTeam(gameModel::TeamSide::RIGHT)->fanblock.getUses(Ftype::WOMBAT) - phaseManager.interferencesUsedRight(Ftype::WOMBAT);
+
         return {environment->clone(), roundNumber, currentPhase, overTimeState, overTimeCounter, goalScored, playersUsedLeft, playersUsedRight, availableFansLeft, availableFansRight};
     }
 
