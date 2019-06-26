@@ -12,23 +12,9 @@
 #include <Mlp/Mlp.hpp>
 #include <SopraMessages/Next.hpp>
 #include <SopraMessages/DeltaRequest.hpp>
+#include <SopraAITools/AITools.h>
 
 namespace ai {
-    constexpr auto FEATURE_VEC_LEN = 122;
-    class State {
-    public:
-        std::shared_ptr<const gameModel::Environment> env;
-        unsigned int roundNumber;
-        communication::messages::types::PhaseType currentPhase;
-        gameController::ExcessLength  overtimeState;
-        unsigned int overTimeCounter;
-        bool goalScoredThisRound;
-        std::unordered_set<communication::messages::types::EntityId> playersUsedLeft;
-        std::unordered_set<communication::messages::types::EntityId> playersUsedRight;
-        std::array<unsigned int, 5> availableFansLeft; //Teleport, RangedAttack, Impulse, SnitchPush, BlockCell
-        std::array<unsigned int, 5> availableFansRight;
-    };
-
     class AI {
     public:
         AI(const std::shared_ptr<gameModel::Environment>& env, gameModel::TeamSide mySide);
@@ -37,7 +23,7 @@ namespace ai {
          * Updates the internal State
          * @param state new State
          */
-        void update(const State &state);
+        void update(const aiTools::State &state);
 
         /**
          * Returns the AIs next action
@@ -48,15 +34,15 @@ namespace ai {
             std::optional<communication::messages::request::DeltaRequest>;
 
     private:
-        State currentState;
+        aiTools::State currentState;
         const gameModel::TeamSide mySide;
-        ml::Mlp<FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
+        ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1> stateEstimator;
 
         /**
-         * Computes a feature vextor from the current state
+         * Computes a feature vextor from the given state
          * @return
          */
-        auto getFeatureVec() const -> std::array<double, FEATURE_VEC_LEN>;
+        auto getFeatureVec(const aiTools::State &state) const -> std::array<double, aiTools::State::FEATURE_VEC_LEN>;
     };
 }
 

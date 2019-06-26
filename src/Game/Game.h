@@ -61,7 +61,7 @@ namespace gameHandling {
          * Gets a copy of the current game state
          * @return
          */
-        auto getState() const -> ai::State;
+        auto getState() const -> aiTools::State;
 
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases

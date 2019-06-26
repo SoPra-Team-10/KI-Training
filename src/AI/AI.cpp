@@ -9,16 +9,16 @@ namespace ai{
         currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity){}
 
-    void AI::update(const State &state) {
+    void AI::update(const aiTools::State &state) {
         this->currentState = state;
     }
 
-    auto AI::getFeatureVec() const -> std::array<double, FEATURE_VEC_LEN> {
-        std::array<double, FEATURE_VEC_LEN> ret = {};
-        auto insertTeam = [this](gameModel::TeamSide side, std::array<double, 120>::iterator &it){
-            auto &usedPlayers = side == gameModel::TeamSide::LEFT ? currentState.playersUsedLeft : currentState.playersUsedRight;
-            auto &availableFans = side == gameModel::TeamSide::LEFT ? currentState.availableFansLeft : currentState.availableFansRight;
-            for(const auto &player : currentState.env->getTeam(side)->getAllPlayers()){
+    auto AI::getFeatureVec(const aiTools::State &state) const -> std::array<double, aiTools::State::FEATURE_VEC_LEN> {
+        std::array<double, aiTools::State::FEATURE_VEC_LEN> ret = {};
+        auto insertTeam = [&state](gameModel::TeamSide side, std::array<double, 120>::iterator &it){
+            auto &usedPlayers = side == gameModel::TeamSide::LEFT ? state.playersUsedLeft : state.playersUsedRight;
+            auto &availableFans = side == gameModel::TeamSide::LEFT ? state.availableFansLeft : state.availableFansRight;
+            for(const auto &player : state.env->getTeam(side)->getAllPlayers()){
                 *it++ = player->position.x;
                 *it++ = player->position.y;
                 bool used = false;
@@ -41,33 +41,33 @@ namespace ai{
         };
 
         auto opponentSide = mySide == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
-        ret[0] = currentState.roundNumber;
-        ret[1] = static_cast<double>(currentState.currentPhase);
-        ret[2] = static_cast<double>(currentState.overtimeState);
-        ret[3] = currentState.overTimeCounter;
-        ret[4] = currentState.goalScoredThisRound;
-        ret[5] = currentState.env->getTeam(mySide)->score;
-        ret[6] = currentState.env->getTeam(opponentSide)->score;
+        ret[0] = state.roundNumber;
+        ret[1] = static_cast<double>(state.currentPhase);
+        ret[2] = static_cast<double>(state.overtimeState);
+        ret[3] = state.overTimeCounter;
+        ret[4] = state.goalScoredThisRound;
+        ret[5] = state.env->getTeam(mySide)->score;
+        ret[6] = state.env->getTeam(opponentSide)->score;
         auto it = ret.begin() + 7;
-        for(const auto &shit : currentState.env->pileOfShit){
+        for(const auto &shit : state.env->pileOfShit){
             *it++ = shit->position.x;
             *it++ = shit->position.y;
         }
 
-        for(unsigned long i = 0; i < 12 - currentState.env->pileOfShit.size(); i++){
+        for(unsigned long i = 0; i < 12 - state.env->pileOfShit.size(); i++){
             *it++ = 0;
             *it++ = 0;
         }
 
-        ret[19] = currentState.env->quaffle->position.x;
-        ret[20] = currentState.env->quaffle->position.y;
-        ret[21] = currentState.env->bludgers[0]->position.x;
-        ret[22] = currentState.env->bludgers[0]->position.y;
-        ret[23] = currentState.env->bludgers[1]->position.x;
-        ret[24] = currentState.env->bludgers[1]->position.y;
-        ret[25] = currentState.env->snitch->position.x;
-        ret[26] = currentState.env->snitch->position.y;
-        ret[27] = currentState.env->snitch->exists;
+        ret[19] = state.env->quaffle->position.x;
+        ret[20] = state.env->quaffle->position.y;
+        ret[21] = state.env->bludgers[0]->position.x;
+        ret[22] = state.env->bludgers[0]->position.y;
+        ret[23] = state.env->bludgers[1]->position.x;
+        ret[24] = state.env->bludgers[1]->position.y;
+        ret[25] = state.env->snitch->position.x;
+        ret[26] = state.env->snitch->position.y;
+        ret[27] = state.env->snitch->exists;
         it = ret.begin() + 28;
         insertTeam(mySide, it);
         insertTeam(opponentSide, it);
@@ -81,13 +81,33 @@ namespace ai{
             return std::nullopt;
         }
 
+        auto evalFun = [this](const aiTools::State &state){
+            return stateEstimator.forward(getFeatureVec(state))[0];
+        };
+
         switch (next.getTurnType()){
             case communication::messages::types::TurnType::MOVE:
-                break;
-            case communication::messages::types::TurnType::ACTION:break;
-            case communication::messages::types::TurnType::FAN:break;
-            case communication::messages::types::TurnType::REMOVE_BAN:break;
+                return aiTools::computeBestMove(currentState, evalFun, next.getEntityId());
+            case communication::messages::types::TurnType::ACTION:{
+                auto type = gameController::getPossibleBallActionType(currentState.env->getPlayerById(next.getEntityId()), currentState.env);
+                if(!type.has_value()){
+                    throw std::runtime_error("No action possible");
+                }
+
+                if(*type == gameController::ActionType::Throw) {
+                    return aiTools::computeBestShot(currentState, evalFun, next.getEntityId());
+                } else if(*type == gameController::ActionType::Wrest) {
+                    return aiTools::computeBestWrest(currentState, evalFun, next.getEntityId());
+                } else {
+                    throw std::runtime_error("Unexpected action type");
+                }
+            }
+            case communication::messages::types::TurnType::FAN:
+                return aiTools::getNextFanTurn(currentState, next);
+            case communication::messages::types::TurnType::REMOVE_BAN:
+                return aiTools::redeployPlayer(currentState, evalFun, next.getEntityId());
+            default:
+                throw std::runtime_error("Enum out of bounds");
         }
-        return {};
     }
 }

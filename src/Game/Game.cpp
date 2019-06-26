@@ -667,7 +667,7 @@ namespace gameHandling{
         }
     }
 
-    auto Game::getState() const -> ai::State{
+    auto Game::getState() const -> aiTools::State{
         using Ftype = communication::messages::types::FanType;
         std::array<unsigned int, 5> availableFansLeft = {};
         std::array<unsigned int, 5> availableFansRight = {};
