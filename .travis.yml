@@ -27,7 +27,7 @@ before_install:
 
 script:
   - docker run -e SONAR_TOKEN=${SONAR_TOKEN} -e TRAVIS_BRANCH=${TRAVIS_BRANCH} kitraining bash run-sonarqube.sh
-  - docker run kitraining build/Tests/Tests --gtest_repeat=10 --gtest_shuffle --gtest_color=yes
+#  - docker run kitraining build/Tests/Tests --gtest_repeat=10 --gtest_shuffle --gtest_color=yes
 
 after_success:
   - cd $TRAVIS_BUILD_DIR
