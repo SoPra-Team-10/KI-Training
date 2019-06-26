@@ -4,7 +4,7 @@
 
 #include <SopraGameLogic/conversions.h>
 #include "AI.h"
-namespace AI{
+namespace ai{
     AI::AI(const std::shared_ptr<gameModel::Environment>& env, gameModel::TeamSide mySide) :
         currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide), stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity){}

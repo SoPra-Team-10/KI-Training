@@ -13,7 +13,7 @@
 #include <SopraMessages/Next.hpp>
 #include <SopraMessages/DeltaRequest.hpp>
 
-namespace AI{
+namespace ai {
     constexpr auto FEATURE_VEC_LEN = 122;
     struct State{
         std::shared_ptr<const gameModel::Environment> env;
