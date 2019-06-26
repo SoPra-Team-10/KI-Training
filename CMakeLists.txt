@@ -22,7 +22,8 @@ set(SOURCES
         ${CMAKE_SOURCE_DIR}/src/Game/MemberSelector.cpp
         ${CMAKE_SOURCE_DIR}/src/Game/PhaseManager.cpp
         ${CMAKE_SOURCE_DIR}/src/Game/ConfigCheck.cpp
-        ${CMAKE_SOURCE_DIR}/src/AI/AI.cpp)
+        ${CMAKE_SOURCE_DIR}/src/AI/AI.cpp
+        ${CMAKE_SOURCE_DIR}/src/Communication/Communicator.cpp)
 
 set(LIBS pthread stdc++fs SopraGameLogic SopraMessages SopraUtil Mlp)
 
