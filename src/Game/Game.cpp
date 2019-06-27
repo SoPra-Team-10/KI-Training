@@ -522,7 +522,6 @@ namespace gameHandling{
                 return false;
             default:
                 throw std::runtime_error(std::string("Fatal error, DeltaType out of range! Possible memory corruption!"));
-                return false;
         }
     }
 
