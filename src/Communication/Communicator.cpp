@@ -65,7 +65,7 @@ communication::Communicator::Communicator(const communication::messages::broadca
     log.info(messages::types::toString(winTuple.second));
 
     ml::util::saveToFile(std::string{"trainingFiles/left_epoch"} + std::to_string(epoch) + std::string{".json"},
-            ais.first.stateEstimator);
+                         ais.first.stateEstimator);
     ml::util::saveToFile(std::string{"trainingFiles/right_epoch"} + std::to_string(epoch) + std::string{".json"},
-            ais.second.stateEstimator);
+                         ais.second.stateEstimator);
 }
