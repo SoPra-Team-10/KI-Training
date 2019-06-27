@@ -85,7 +85,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
 <div class="title">communication::Communicator Class Reference</div>  </div>
 </div><!--header-->
@@ -93,9 +94,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6313c5f3e371cbcb9791cd7dd93b7c6e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6313c5f3e371cbcb9791cd7dd93b7c6e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Communicator</b> (const messages::broadcast::MatchConfig &amp;matchConfig, const messages::request::TeamConfig &amp;leftTeamConfig, const messages::request::TeamConfig &amp;rightTeamConfig, util::Logging &amp;log, double learningRate, double discountRate, int epoch)</td></tr>
-<tr class="separator:a6313c5f3e371cbcb9791cd7dd93b7c6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6f82c4d29fe756808fe8e45da354e51"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6f82c4d29fe756808fe8e45da354e51"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Communicator</b> (const messages::broadcast::MatchConfig &amp;matchConfig, const messages::request::TeamConfig &amp;leftTeamConfig, const messages::request::TeamConfig &amp;rightTeamConfig, util::Logging &amp;log, double learningRate, double discountRate, const std::pair&lt; ml::Mlp&lt; aiTools::State::FEATURE_VEC_LEN, 200, 200, 1 &gt;, ml::Mlp&lt; aiTools::State::FEATURE_VEC_LEN, 200, 200, 1 &gt;&gt; &amp;mlps)</td></tr>
+<tr class="separator:af6f82c4d29fe756808fe8e45da354e51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr class="memitem:ae961eae4da8e04d86622278294965710"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae961eae4da8e04d86622278294965710"></a>
+std::pair&lt; ml::Mlp<br class="typebreak"/>
+&lt; aiTools::State::FEATURE_VEC_LEN, 200, 200, 1 &gt;<br class="typebreak"/>
+, ml::Mlp<br class="typebreak"/>
+&lt; aiTools::State::FEATURE_VEC_LEN, 200, 200, 1 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>mlps</b></td></tr>
+<tr class="separator:ae961eae4da8e04d86622278294965710"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/travis/build/SoPra-Team-10/KI-Training/src/Communication/<a class="el" href="_communicator_8h_source.html">Communicator.h</a></li>
