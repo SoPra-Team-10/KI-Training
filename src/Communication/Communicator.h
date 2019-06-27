@@ -16,7 +16,12 @@ namespace communication {
                 const messages::request::TeamConfig &leftTeamConfig,
                 const messages::request::TeamConfig &rightTeamConfig,
                 util::Logging &log, double learningRate, double discountRate,
-                int epoch);
+                const std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+                ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &mlps);
+
+        std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> mlps;
+
 
     private:
         gameHandling::Game game;

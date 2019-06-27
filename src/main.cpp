@@ -6,6 +6,7 @@
 #include <SopraMessages/MatchConfig.hpp>
 #include <SopraUtil/Logging.hpp>
 #include <Communication/Communicator.h>
+#include <Mlp/Util.h>
 
 template <typename T>
 auto readFromFileToJson(const std::string &fname) -> T {
@@ -50,10 +51,25 @@ int main(int argc, char *argv[]) {
 
     util::Logging log{std::cout, 3};
 
+    auto mlps = std::make_pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>({ml::functions::relu, ml::functions::relu, ml::functions::identity},
+                                                                   {ml::functions::relu, ml::functions::relu, ml::functions::identity});
+
     for (auto epoch = 0; epoch < 10000; ++epoch) {
         communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
-                                                 discountRate, epoch};
-        log.warn("Epoch " + std::to_string(epoch) + " finished");
+                                                 discountRate, mlps};
+
+        mlps = communicator.mlps;
+
+        log.warn("Epoch finished");
+
+        if (epoch % 100 == 0) {
+            ml::util::saveToFile(std::string{"trainingFiles/left_epoch"} + std::to_string(epoch) + std::string{".json"},
+                                 mlps.first);
+            ml::util::saveToFile(
+                    std::string{"trainingFiles/right_epoch"} + std::to_string(epoch) + std::string{".json"},
+                    mlps.second);
+        }
     }
 
     return 0;
