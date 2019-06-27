@@ -377,6 +377,8 @@ namespace gameHandling{
                                 log.debug("Goal was scored");
                             } else if(result == gameController::ActionResult::SnitchCatch){
                                 snitchCaught = true;
+                            } else if(result == gameController::ActionResult::FoolAway) {
+                                log.debug("Quaffle was lost due to ramming");
                             } else {
                                 throw std::runtime_error(std::string{"Unexpected action result"});
                             }
@@ -522,15 +524,15 @@ namespace gameHandling{
                 return false;
             default:
                 throw std::runtime_error(std::string("Fatal error, DeltaType out of range! Possible memory corruption!"));
-                return false;
         }
     }
 
     void Game::executeBallDelta(communication::messages::types::EntityId entityId){
         std::shared_ptr<gameModel::Ball> ball;
+        using namespace communication::messages::types;
 
-        if (entityId == communication::messages::types::EntityId::BLUDGER1 ||
-            entityId == communication::messages::types::EntityId::BLUDGER2) {
+        if (entityId == EntityId::BLUDGER1 ||
+            entityId == EntityId::BLUDGER2) {
             try{
                 ball = environment->getBallByID(entityId);
                 std::shared_ptr<gameModel::Bludger> bludger = std::dynamic_pointer_cast<gameModel::Bludger>(ball);
@@ -539,12 +541,19 @@ namespace gameHandling{
                     throw std::runtime_error(std::string{"We done fucked it up!"});
                 }
 
+                log.debug(toString(entityId) + " moves. Position before move: [" +
+                     std::to_string(bludger->position.x) + ", " + std::to_string(bludger->position.y) + "]");
                 auto res = gameController::moveBludger(bludger, environment);
+                log.debug(toString(entityId) + " moves. Position after move: [" +
+                    std::to_string(bludger->position.x) + ", " + std::to_string(bludger->position.y) + "]");
+                if(res.has_value()){
+                    log.debug("Bludger knocked out a player and was redeployed");
+                }
             } catch (std::exception &e){
                 throw std::runtime_error(e.what());
             }
 
-        } else if (entityId == communication::messages::types::EntityId::SNITCH) {
+        } else if (entityId == EntityId::SNITCH) {
             ball = environment->snitch;
             auto snitch = std::dynamic_pointer_cast<gameModel::Snitch>(ball);
             if(!snitch){

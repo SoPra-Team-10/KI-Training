@@ -25,11 +25,10 @@ communication::Communicator::Communicator(const communication::messages::broadca
                 (std::string{"trainingFiles/right_epoch"} + std::to_string(epoch-1) + std::string{".json"});
     }
 
-    while (!game.winEvent.has_value()) {
-        ais.first.update(game.getState(), std::nullopt);
-        ais.second.update(game.getState(), std::nullopt);
+    auto next = game.getNextAction();
 
-        auto next = game.getNextAction();
+    while (!game.winEvent.has_value()) {
+        std::optional<gameModel::TeamSide> lastTeamSide;
 
         if (gameLogic::conversions::isBall(next.getEntityId())) {
             game.executeBallDelta(next.getEntityId());
@@ -43,18 +42,24 @@ communication::Communicator::Communicator(const communication::messages::broadca
             } else if (action1.has_value()) {
                 game.executeDelta(action1.value(), gameModel::TeamSide::LEFT);
                 log.debug("Player 1");
+                lastTeamSide = gameModel::TeamSide::LEFT;
             } else if (action2.has_value()) {
                 game.executeDelta(action2.value(), gameModel::TeamSide::RIGHT);
                 log.debug("Player 2");
+                lastTeamSide = gameModel::TeamSide::RIGHT;
             } else {
                 throw std::runtime_error{"No player wants to perform an action!"};
             }
         }
+
+        next = game.getNextAction();
+        ais.first.update(game.getState(), std::nullopt, lastTeamSide);
+        ais.second.update(game.getState(), std::nullopt,lastTeamSide);
     }
     auto winTuple = game.winEvent.value();
 
-    ais.first.update(game.getState(), winTuple.first);
-    ais.second.update(game.getState(), winTuple.first);
+    ais.first.update(game.getState(), winTuple.first, winTuple.first);
+    ais.second.update(game.getState(), winTuple.first, winTuple.first);
 
     log.info("Game finished:");
     log.info(messages::types::toString(winTuple.second));
