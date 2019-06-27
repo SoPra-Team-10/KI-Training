@@ -97,8 +97,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9400e72961e05144eb0cbcb8dea2e0fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9400e72961e05144eb0cbcb8dea2e0fe"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>AI</b> (const std::shared_ptr&lt; gameModel::Environment &gt; &amp;env, gameModel::TeamSide mySide, double learningRate, double discountRate, util::Logging log)</td></tr>
 <tr class="separator:a9400e72961e05144eb0cbcb8dea2e0fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae734b486b11e12b17ce3078d83ccbc8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai_1_1_a_i.html#ae734b486b11e12b17ce3078d83ccbc8e">update</a> (const aiTools::State &amp;state, const std::optional&lt; gameModel::TeamSide &gt; &amp;winningSide)</td></tr>
-<tr class="separator:ae734b486b11e12b17ce3078d83ccbc8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2f8efaa4433c638b652b1deb23330bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai_1_1_a_i.html#af2f8efaa4433c638b652b1deb23330bc">update</a> (const aiTools::State &amp;state, const std::optional&lt; gameModel::TeamSide &gt; &amp;winningSide, const std::optional&lt; gameModel::TeamSide &gt; &amp;side)</td></tr>
+<tr class="separator:af2f8efaa4433c638b652b1deb23330bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b394dca826e5a7a140bea17bca394ef"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classai_1_1_a_i.html#a3b394dca826e5a7a140bea17bca394ef">getNextAction</a> (const communication::messages::broadcast::Next &amp;next) const -&gt; std::optional&lt; communication::messages::request::DeltaRequest &gt;</td></tr>
 <tr class="separator:a3b394dca826e5a7a140bea17bca394ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -134,7 +134,7 @@ ml::Mlp<br class="typebreak"/>
 
 </div>
 </div>
-<a class="anchor" id="ae734b486b11e12b17ce3078d83ccbc8e"></a>
+<a class="anchor" id="af2f8efaa4433c638b652b1deb23330bc"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -148,7 +148,13 @@ ml::Mlp<br class="typebreak"/>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::optional&lt; gameModel::TeamSide &gt; &amp;&#160;</td>
-          <td class="paramname"><em>winningSide</em>&#160;</td>
+          <td class="paramname"><em>winningSide</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::optional&lt; gameModel::TeamSide &gt; &amp;&#160;</td>
+          <td class="paramname"><em>side</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
