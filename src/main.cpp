@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
     util::Logging log{std::cout, 4};
 
-    for (auto epoch = 0; epoch < 10; ++epoch) {
+    for (auto epoch = 0; epoch < 1000; ++epoch) {
         communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
                                                  discountRate, epoch};
         log.warn("Epoch finished");
