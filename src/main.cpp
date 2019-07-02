@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     auto leftTeamConfig = readFromFileToJson<messages::request::TeamConfig>(leftTeamConfiPath);
     auto rightTeamConfig = readFromFileToJson<messages::request::TeamConfig>(rightTeamConfigPath);
 
-    util::Logging log{std::cout, 4};
+    util::Logging log{std::cout, 2};
 
     std::unique_ptr<std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>> mlps;
@@ -94,13 +94,15 @@ int main(int argc, char *argv[]) {
         std::unique_ptr<Communicator> communicator;
         if(expEpochs.has_value() && epoch % *expEpochs == 0){
             if(*expDirIt == std::filesystem::end(*expDirIt)){
-                log.warn("--- No experience left ---");
-            } else {
-                log.info("--- Experience replay epoch ---");
-                auto state = readFromFileToJson<aiTools::State>(expDirIt.value()->path().string());
-                communicator = std::make_unique<Communicator>(matchConfig, state, log, learningRate, discountRate, *mlps, "NewExperiences/");
-                ++(*expDirIt);
+                log.warn("--- No experience left, resetting ---");
+                expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
             }
+
+            log.warn("--- Experience replay epoch ---");
+            auto state = readFromFileToJson<aiTools::State>(expDirIt.value()->path().string());
+            communicator = std::make_unique<Communicator>(matchConfig, state, log, learningRate, discountRate, *mlps, "NewExperiences/");
+            ++(*expDirIt);
+
         } else {
             communicator = std::make_unique<Communicator>(matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
                                                  discountRate, *mlps, "NewExperiences/");
