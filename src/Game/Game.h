@@ -33,7 +33,15 @@ namespace gameHandling {
              const communication::messages::request::TeamConfig& teamConfig2,
              communication::messages::request::TeamFormation teamFormation1,
              communication::messages::request::TeamFormation teamFormation2,
-             util::Logging &log, std::string expPath);
+             util::Logging &log, std::string expDir);
+
+        /**
+         * Constructs a game from a saved experience
+         * @param expFile file to load the experience from
+         * @param log logging instance
+         * @param expPath directory to save the new experiences to
+         */
+        Game(communication::messages::broadcast::MatchConfig matchConfig, const aiTools::State &state, util::Logging &log, std::string expDir);
 
         mutable std::optional<std::pair<gameModel::TeamSide, communication::messages::types::VictoryReason>> winEvent;
 
@@ -67,7 +75,6 @@ namespace gameHandling {
          * Saves the current State if certain conditions are met
          */
         void saveExperience() const;
-
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases
         communication::messages::types::EntityId ballTurn =
@@ -77,7 +84,6 @@ namespace gameHandling {
         PhaseManager phaseManager;
         communication::messages::broadcast::Next expectedRequestType{}; ///<Next-object containing information about the next expected request from a client
         gameModel::TeamSide currentSide; ///<Current side to make a move
-        util::Logging &log;
         gameController::ExcessLength overTimeState = gameController::ExcessLength::None;
         unsigned int overTimeCounter = 0;
         bool goalScored = false;
@@ -85,6 +91,7 @@ namespace gameHandling {
         std::optional<gameModel::TeamSide> firstSideDisqualified = std::nullopt;
         std::unordered_set<communication::messages::types::EntityId> playersUsedLeft = {};
         std::unordered_set<communication::messages::types::EntityId> playersUsedRight = {};
+        util::Logging &log;
         std::string experienceDirectory;
 
         auto getUsedPlayers(const gameModel::TeamSide &side) -> std::unordered_set<communication::messages::types::EntityId>&;

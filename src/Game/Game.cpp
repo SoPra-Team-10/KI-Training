@@ -13,12 +13,26 @@
 namespace gameHandling{
     Game::Game(communication::messages::broadcast::MatchConfig matchConfig, const communication::messages::request::TeamConfig& teamConfig1,
             const communication::messages::request::TeamConfig& teamConfig2, communication::messages::request::TeamFormation teamFormation1,
-               communication::messages::request::TeamFormation teamFormation2, util::Logging &log, std::string expPath) : environment(std::make_shared<gameModel::Environment>
+               communication::messages::request::TeamFormation teamFormation2, util::Logging &log, std::string expDir) : environment(std::make_shared<gameModel::Environment>
                        (matchConfig, teamConfig1, teamConfig2, teamFormation1, teamFormation2)),
                        timeouts{matchConfig.getPlayerTurnTimeout(), matchConfig.getFanTurnTimeout(), matchConfig.getUnbanTurnTimeout()},
-                       phaseManager(environment->team1, environment->team2, environment, timeouts), log(log), experienceDirectory(std::move(expPath)){
+                       phaseManager(environment->team1, environment->team2, environment, timeouts), log(log), experienceDirectory(std::move(expDir)){
         log.debug("Constructed game");
     }
+
+    Game::Game(communication::messages::broadcast::MatchConfig matchConfig, const aiTools::State &state, util::Logging &log, std::string expDir) :
+        environment(state.env), currentPhase(state.currentPhase), roundNumber(state.roundNumber),
+        timeouts{matchConfig.getPlayerTurnTimeout(), matchConfig.getFanTurnTimeout(), matchConfig.getUnbanTurnTimeout()},
+        phaseManager(environment->team1, environment->team2, environment, timeouts), overTimeState(state.overtimeState),
+        overTimeCounter(state.overTimeCounter), goalScored(state.goalScoredThisRound), log(log),experienceDirectory(std::move(expDir)){
+        for(const auto &player : environment->getAllPlayers()){
+            if(player->isFined){
+                bannedPlayers.emplace_back(player);
+            }
+        }
+    }
+
+
 
     auto Game::getNextAction() -> communication::messages::broadcast::Next {
         using namespace communication::messages::types;
@@ -723,4 +737,5 @@ namespace gameHandling{
             }
         }
     }
+
 }
