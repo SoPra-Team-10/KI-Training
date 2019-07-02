@@ -49,21 +49,21 @@ int main(int argc, char *argv[]) {
     auto leftTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(leftTeamConfiPath);
     auto rightTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(rightTeamConfigPath);
 
-    util::Logging log{std::cout, 3};
+    util::Logging log{std::cout, 2};
 
     auto mlps = std::make_pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>({ml::functions::relu, ml::functions::relu, ml::functions::identity},
                                                                    {ml::functions::relu, ml::functions::relu, ml::functions::identity});
 
-    for (auto epoch = 0; epoch < 10000; ++epoch) {
+    for (auto epoch = 0; epoch < std::numeric_limits<int>::max(); ++epoch) {
         communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
                                                  discountRate, mlps};
 
         mlps = communicator.mlps;
 
-        log.warn("Epoch finished");
+        log.warn("Epoch finished: " + std::to_string(epoch));
 
-        if (epoch % 100 == 0) {
+        if (epoch % 100000 == 0) {
             ml::util::saveToFile(std::string{"trainingFiles/left_epoch"} + std::to_string(epoch) + std::string{".json"},
                                  mlps.first);
             ml::util::saveToFile(
