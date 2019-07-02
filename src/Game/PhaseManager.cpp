@@ -76,14 +76,14 @@ namespace gameHandling{
                     playerTurnState = PlayerTurnState::PossibleAction;
                 }
 
-                return broadcast::Next{currentPlayer.value()->id, types::TurnType::MOVE, timeouts.playerTurn};
+                return broadcast::Next{currentPlayer.value()->getId(), types::TurnType::MOVE, timeouts.playerTurn};
             case PlayerTurnState::ExtraMove:
                 playerTurnState = PlayerTurnState::PossibleAction;
-                return broadcast::Next{currentPlayer.value()->id, types::TurnType::MOVE, timeouts.playerTurn};
+                return broadcast::Next{currentPlayer.value()->getId(), types::TurnType::MOVE, timeouts.playerTurn};
             case PlayerTurnState::PossibleAction:
                 playerTurnState = PlayerTurnState::Move;
                 if(gameController::playerCanPerformAction(currentPlayer.value(), env)){
-                    auto id = currentPlayer.value()->id;
+                    auto id = currentPlayer.value()->getId();
                     currentPlayer.reset();
                     return broadcast::Next{id, types::TurnType::ACTION, timeouts.playerTurn};
                 } else {
@@ -197,8 +197,8 @@ namespace gameHandling{
     }
 
     bool PhaseManager::playerUsed(const std::shared_ptr<const gameModel::Player> &player) const {
-        auto &team = getTeam(gameLogic::conversions::idToSide(player->id));
-        return team.playerUsed(player->id) && (currentPlayer != player || (playerTurnState == PlayerTurnState::PossibleAction &&
+        auto &team = getTeam(gameLogic::conversions::idToSide(player->getId()));
+        return team.playerUsed(player->getId()) && (currentPlayer != player || (playerTurnState == PlayerTurnState::PossibleAction &&
             !gameController::playerCanPerformAction(player, env)));
     }
 

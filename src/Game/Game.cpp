@@ -8,14 +8,15 @@
 #include <SopraGameLogic/GameModel.h>
 #include <SopraGameLogic/conversions.h>
 #include <AI/AI.h>
+#include <fstream>
 
 namespace gameHandling{
     Game::Game(communication::messages::broadcast::MatchConfig matchConfig, const communication::messages::request::TeamConfig& teamConfig1,
             const communication::messages::request::TeamConfig& teamConfig2, communication::messages::request::TeamFormation teamFormation1,
-               communication::messages::request::TeamFormation teamFormation2, util::Logging &log) : environment(std::make_shared<gameModel::Environment>
+               communication::messages::request::TeamFormation teamFormation2, util::Logging &log, std::string expPath) : environment(std::make_shared<gameModel::Environment>
                        (matchConfig, teamConfig1, teamConfig2, teamFormation1, teamFormation2)),
                        timeouts{matchConfig.getPlayerTurnTimeout(), matchConfig.getFanTurnTimeout(), matchConfig.getUnbanTurnTimeout()},
-                       phaseManager(environment->team1, environment->team2, environment, timeouts), log(log){
+                       phaseManager(environment->team1, environment->team2, environment, timeouts), log(log), experienceDirectory(std::move(expPath)){
         log.debug("Constructed game");
     }
 
@@ -98,7 +99,7 @@ namespace gameHandling{
                         return getNextAction();
                     } else {
                         log.debug("Requested unban");
-                        auto actorId = (*bannedPlayers.begin())->id;
+                        auto actorId = (*bannedPlayers.begin())->getId();
                         currentSide = gameLogic::conversions::idToSide(actorId);
                         bannedPlayers.erase(bannedPlayers.begin());
                         return expectedRequestType = {actorId, TurnType::REMOVE_BAN, timeouts.unbanTurn};
@@ -119,7 +120,7 @@ namespace gameHandling{
                 bannedPlayers.emplace_back(player);
                 if(!firstSideDisqualified.has_value() &&
                    environment->getTeam(player)->numberOfBannedMembers() > MAX_BAN_COUNT) {
-                    firstSideDisqualified = environment->getTeam(player)->side;
+                    firstSideDisqualified = environment->getTeam(player)->getSide();
                 }
             }
         };
@@ -164,7 +165,7 @@ namespace gameHandling{
 
                         auto res = bShot.execute();
                         addFouls(res.second, player);
-                        getUsedPlayers(side).emplace(player->id);
+                        getUsedPlayers(side).emplace(player->getId());
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
@@ -209,7 +210,7 @@ namespace gameHandling{
                             }
                         }
 
-                        getUsedPlayers(side).emplace(player->id);
+                        getUsedPlayers(side).emplace(player->getId());
                         return true;
                     } catch (std::exception &e){
                         throw std::runtime_error(e.what());
@@ -396,7 +397,7 @@ namespace gameHandling{
                         }
 
                         if(phaseManager.playerUsed(player)){
-                            getUsedPlayers(side).emplace(player->id);
+                            getUsedPlayers(side).emplace(player->getId());
                         }
 
                         if(snitchCaught){
@@ -617,7 +618,7 @@ namespace gameHandling{
 
         switch (overTimeState){
             case gameController::ExcessLength::None:
-                if(roundNumber == environment->config.maxRounds){
+                if(roundNumber == environment->config.getMaxRounds()){
                     overTimeState = gameController::ExcessLength::Stage1;
                 }
 
@@ -677,5 +678,49 @@ namespace gameHandling{
     auto Game::getUsedPlayers(const gameModel::TeamSide &side) ->
         std::unordered_set<communication::messages::types::EntityId> & {
         return side == gameModel::TeamSide::LEFT ? playersUsedLeft : playersUsedRight;
+    }
+
+    void Game::saveState(const aiTools::State &state, const std::string &path) const {
+        nlohmann::json j;
+        j = state;
+        auto data = j.dump();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch());
+        std::ofstream file(path + "state_" + std::to_string(ms.count()) + ".json");
+        file << data;
+        file.close();
+    }
+
+    void Game::saveExperience() const {
+        using namespace communication::messages::types;
+        auto currentState = getState();
+        auto playerOnQuaffle = currentState.env->getPlayer(currentState.env->quaffle->position);
+        auto playerOnBludger0 = currentState.env->getPlayer(currentState.env->bludgers[0]->position);
+        auto playerOnBludger1 = currentState.env->getPlayer(currentState.env->bludgers[1]->position);
+        auto snitchExists = currentState.env->snitch->exists && ballTurn == EntityId::BLUDGER1 &&
+                currentState.currentPhase == PhaseType::BALL_PHASE;
+
+        auto notUsed = [&currentState](const std::shared_ptr<gameModel::Player> &p){
+            return currentState.playersUsedLeft.find(p->getId()) == currentState.playersUsedLeft.end() &&
+                currentState.playersUsedRight.find(p->getId()) == currentState.playersUsedRight.end();
+        };
+
+        auto qThrowPossible = playerOnQuaffle.has_value() && !(*playerOnQuaffle)->knockedOut && notUsed(*playerOnQuaffle);
+        auto bShotPossible = (playerOnBludger0.has_value() && INSTANCE_OF(*playerOnBludger0, gameModel::Beater) && notUsed(*playerOnBludger0)) ||
+                (playerOnBludger1.has_value() && INSTANCE_OF(*playerOnBludger1, gameModel::Beater) && notUsed(*playerOnBludger1));
+        if(qThrowPossible || bShotPossible || snitchExists){
+            saveState(currentState, experienceDirectory);
+            if(qThrowPossible){
+                log.info("Throw possible, saving state");
+            }
+
+            if(bShotPossible){
+                log.info("Bludger shot possible, saving state");
+            }
+
+            if(snitchExists){
+                log.info("Snitch exists, saving state");
+            }
+        }
     }
 }

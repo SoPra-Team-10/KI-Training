@@ -12,10 +12,10 @@ communication::Communicator::Communicator(const communication::messages::broadca
                                           const communication::messages::request::TeamConfig &rightTeamConfig,
                                           util::Logging &log, double learningRate, double discountRate,
                                           const std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
-                            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &mlps)
+                            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &mlps, std::string expDir)
                                           : game{matchConfig, leftTeamConfig, rightTeamConfig,
                                                  aiTools::getTeamFormation(gameModel::TeamSide::LEFT),
-                                                 aiTools::getTeamFormation(gameModel::TeamSide::RIGHT), log},
+                                                 aiTools::getTeamFormation(gameModel::TeamSide::RIGHT), log, std::move(expDir)},
                                             ais{std::make_pair(
                                                     ai::AI{game.environment, gameModel::TeamSide::LEFT, learningRate, discountRate, log},
                                                     ai::AI{game.environment, gameModel::TeamSide::RIGHT, learningRate, discountRate, log})},
@@ -53,6 +53,7 @@ communication::Communicator::Communicator(const communication::messages::broadca
         next = game.getNextAction();
         ais.first.update(game.getState(), std::nullopt, lastTeamSide);
         ais.second.update(game.getState(), std::nullopt,lastTeamSide);
+        game.saveExperience();
     }
     auto winTuple = game.winEvent.value();
 

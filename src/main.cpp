@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     auto leftTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(leftTeamConfiPath);
     auto rightTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(rightTeamConfigPath);
 
-    util::Logging log{std::cout, 2};
+    util::Logging log{std::cout, 4};
 
     auto mlps = std::make_pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>({ml::functions::relu, ml::functions::relu, ml::functions::identity},
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     for (auto epoch = 0; epoch < std::numeric_limits<int>::max(); ++epoch) {
         communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
-                                                 discountRate, mlps};
+                                                 discountRate, mlps, "Experiences/"};
 
         mlps = communicator.mlps;
 

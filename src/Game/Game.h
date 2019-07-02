@@ -33,7 +33,7 @@ namespace gameHandling {
              const communication::messages::request::TeamConfig& teamConfig2,
              communication::messages::request::TeamFormation teamFormation1,
              communication::messages::request::TeamFormation teamFormation2,
-             util::Logging &log);
+             util::Logging &log, std::string expPath);
 
         mutable std::optional<std::pair<gameModel::TeamSide, communication::messages::types::VictoryReason>> winEvent;
 
@@ -63,6 +63,11 @@ namespace gameHandling {
          */
         auto getState() const -> aiTools::State;
 
+        /**
+         * Saves the current State if certain conditions are met
+         */
+        void saveExperience() const;
+
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases
         communication::messages::types::EntityId ballTurn =
@@ -80,6 +85,7 @@ namespace gameHandling {
         std::optional<gameModel::TeamSide> firstSideDisqualified = std::nullopt;
         std::unordered_set<communication::messages::types::EntityId> playersUsedLeft = {};
         std::unordered_set<communication::messages::types::EntityId> playersUsedRight = {};
+        std::string experienceDirectory;
 
         auto getUsedPlayers(const gameModel::TeamSide &side) -> std::unordered_set<communication::messages::types::EntityId>&;
 
@@ -100,6 +106,13 @@ namespace gameHandling {
          * Prepares the game state for the next round.
          */
         void endRound();
+
+        /**
+         * Saves a game state to the specified directory
+         * @param state The state to be saved
+         * @param path path to directory where state is to be saved
+         */
+        void saveState(const aiTools::State &state, const std::string &path) const;
     };
 }
 

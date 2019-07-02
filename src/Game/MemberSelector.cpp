@@ -71,7 +71,7 @@ namespace gameHandling{
         }
 
         for(const auto &player: playersLeft){
-            if(player->id == id){
+            if(player->getId() == id){
                 return false;
             }
         }
