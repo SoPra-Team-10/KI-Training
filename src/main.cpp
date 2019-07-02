@@ -33,8 +33,9 @@ auto readFromFileToJson(const std::string &fname) -> T {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 6) {
-        std::cerr << "Usage: KiTraining matchConfig.json leftTeamConfig.json rightTeamConfig.json learningRate discountRate" << std::endl;
+    using namespace communication;
+    if (argc != 6 && argc != 7 && argc != 8 && argc != 9) {
+        std::cerr << "Usage: KiTraining matchConfig.json leftTeamConfig.json rightTeamConfig.json learningRate discountRate [pretrainedNet] [experienceDirectory experienceReplayEpochCount]" << std::endl;
         std::exit(1);
     }
 
@@ -43,32 +44,78 @@ int main(int argc, char *argv[]) {
     std::string rightTeamConfigPath{argv[3]};
     auto learningRate = std::stod(argv[4]);
     auto discountRate = std::stod(argv[5]);
+    std::optional<std::string> expDir;
+    std::optional<int> expEpochs;
+    std::optional<std::filesystem::directory_iterator> expDirIt;
+    std::optional<std::string> pretrainedNet;
+    if(argc == 7) {
+        pretrainedNet.emplace(argv[6]);
+    } else if(argc == 8) {
+        expDir.emplace(argv[6]);
+        expEpochs.emplace(std::stoi(argv[7]));
+        expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
+    } else if(argc == 9) {
+        pretrainedNet.emplace(argv[6]);
+        expDir.emplace(argv[7]);
+        expEpochs.emplace(std::stoi(argv[8]));
+        expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
+    }
 
-
-    auto matchConfig = readFromFileToJson<communication::messages::broadcast::MatchConfig>(matchConfigPath);
-    auto leftTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(leftTeamConfiPath);
-    auto rightTeamConfig = readFromFileToJson<communication::messages::request::TeamConfig>(rightTeamConfigPath);
+    auto matchConfig = readFromFileToJson<messages::broadcast::MatchConfig>(matchConfigPath);
+    auto leftTeamConfig = readFromFileToJson<messages::request::TeamConfig>(leftTeamConfiPath);
+    auto rightTeamConfig = readFromFileToJson<messages::request::TeamConfig>(rightTeamConfigPath);
 
     util::Logging log{std::cout, 4};
 
-    auto mlps = std::make_pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+    std::unique_ptr<std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>> mlps;
+
+    if(pretrainedNet.has_value()){
+        log.info("--- training with pretrained net ---");
+        mlps = std::make_unique<decltype(mlps)::element_type>(std::make_pair(ml::util::loadFromFile<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>(*pretrainedNet),
+                    ml::util::loadFromFile<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>(*pretrainedNet)));
+    } else {
+        mlps = std::make_unique<std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>>(std::make_pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>({ml::functions::relu, ml::functions::relu, ml::functions::identity},
-                                                                   {ml::functions::relu, ml::functions::relu, ml::functions::identity});
+                                                                   {ml::functions::relu, ml::functions::relu, ml::functions::identity}));
+    }
+
+    if(argc < 8){
+        log.info("No directory for experience replay specified");
+    }
+
+    if(expDirIt.has_value() && *expDirIt == std::filesystem::end(*expDirIt)){
+        log.warn("No experiences found in " + *expDir);
+    }
+
 
     for (auto epoch = 0; epoch < std::numeric_limits<int>::max(); ++epoch) {
-        communication::Communicator communicator{matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
-                                                 discountRate, mlps, "Experiences/"};
+        std::unique_ptr<Communicator> communicator;
+        if(expEpochs.has_value() && epoch % *expEpochs == 0){
+            if(*expDirIt == std::filesystem::end(*expDirIt)){
+                log.warn("--- No experience left ---");
+            } else {
+                log.info("--- Experience replay epoch ---");
+                auto state = readFromFileToJson<aiTools::State>(expDirIt.value()->path().string());
+                communicator = std::make_unique<Communicator>(matchConfig, state, log, learningRate, discountRate, *mlps, "NewExperiences/");
+                ++(*expDirIt);
+            }
+        } else {
+            communicator = std::make_unique<Communicator>(matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
+                                                 discountRate, *mlps, "NewExperiences/");
+        }
 
-        mlps = communicator.mlps;
+        mlps = std::make_unique<decltype(communicator->mlps)>(communicator->mlps);
 
         log.warn("Epoch finished: " + std::to_string(epoch));
 
         if (epoch % 100000 == 0) {
             ml::util::saveToFile(std::string{"trainingFiles/left_epoch"} + std::to_string(epoch) + std::string{".json"},
-                                 mlps.first);
+                                 mlps->first);
             ml::util::saveToFile(
                     std::string{"trainingFiles/right_epoch"} + std::to_string(epoch) + std::string{".json"},
-                    mlps.second);
+                    mlps->second);
         }
     }
 

@@ -24,6 +24,7 @@ namespace gameHandling {
     constexpr auto SNITCH_SPAWN_ROUND = 10;
     constexpr auto OVERTIME_INTERVAL = 3;
     constexpr auto MAX_BAN_COUNT = 2;
+    constexpr auto MAX_EXP_DELAY_ROUNDS = 3;
 
     class Game {
     public:
@@ -74,7 +75,7 @@ namespace gameHandling {
         /**
          * Saves the current State if certain conditions are met
          */
-        void saveExperience() const;
+        void saveExperience();
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases
         communication::messages::types::EntityId ballTurn =
@@ -93,6 +94,7 @@ namespace gameHandling {
         std::unordered_set<communication::messages::types::EntityId> playersUsedRight = {};
         util::Logging &log;
         std::string experienceDirectory;
+        int expDelay = 0;
 
         auto getUsedPlayers(const gameModel::TeamSide &side) -> std::unordered_set<communication::messages::types::EntityId>&;
 

@@ -19,14 +19,21 @@ namespace communication {
                 const std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
                 ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &mlps, std::string expDir);
 
+
+        Communicator(const messages::broadcast::MatchConfig &matchConfig, const aiTools::State &state,
+                util::Logging &log, double learningRate, double discountRate,
+                const std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+                ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &mlps, std::string expDir);
+
         std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> mlps;
-
 
     private:
         gameHandling::Game game;
         std::pair<ai::AI, ai::AI> ais;
         util::Logging &log;
+        void run(const std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
+                            ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>> &nets);
     };
 }
 

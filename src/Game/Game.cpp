@@ -30,6 +30,8 @@ namespace gameHandling{
                 bannedPlayers.emplace_back(player);
             }
         }
+
+        expDelay = MAX_EXP_DELAY_ROUNDS;
     }
 
 
@@ -705,8 +707,12 @@ namespace gameHandling{
         file.close();
     }
 
-    void Game::saveExperience() const {
+    void Game::saveExperience() {
         using namespace communication::messages::types;
+        if(expDelay-- > 0){
+            return;
+        }
+
         auto currentState = getState();
         auto playerOnQuaffle = currentState.env->getPlayer(currentState.env->quaffle->position);
         auto playerOnBludger0 = currentState.env->getPlayer(currentState.env->bludgers[0]->position);
