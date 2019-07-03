@@ -24,10 +24,19 @@ namespace gameHandling{
         environment(state.env), currentPhase(state.currentPhase), roundNumber(state.roundNumber),
         timeouts{matchConfig.getPlayerTurnTimeout(), matchConfig.getFanTurnTimeout(), matchConfig.getUnbanTurnTimeout()},
         phaseManager(environment->team1, environment->team2, environment, timeouts), overTimeState(state.overtimeState),
-        overTimeCounter(state.overTimeCounter), goalScored(state.goalScoredThisRound), log(log),experienceDirectory(std::move(expDir)){
+        overTimeCounter(state.overTimeCounter), goalScored(state.goalScoredThisRound), log(log), experienceDirectory(std::move(expDir)){
         for(const auto &player : environment->getAllPlayers()){
             if(player->isFined){
                 bannedPlayers.emplace_back(player);
+            }
+        }
+
+        if(environment->team1->numberOfBannedMembers() > MAX_BAN_COUNT &&
+            environment->team2->numberOfBannedMembers() > MAX_BAN_COUNT) {
+            if(gameController::rng(0, 1)){
+                firstSideDisqualified.emplace(gameModel::TeamSide::LEFT);
+            } else {
+                firstSideDisqualified.emplace(gameModel::TeamSide::RIGHT);
             }
         }
 
@@ -614,7 +623,7 @@ namespace gameHandling{
             auto winningTeam = getVictoriousTeam(environment->team1->keeper);
             if(winningTeam.second != VictoryReason::MOST_POINTS) {
                 if(!firstSideDisqualified.has_value()){
-                    throw std::runtime_error("Fatal error, inconsistent game state");
+                    throw std::runtime_error("--- Fatal error, inconsistent game state ---");
                 }
 
                 auto winningSide = firstSideDisqualified.value() == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
@@ -660,14 +669,14 @@ namespace gameHandling{
     communication::messages::types::VictoryReason> {
         using namespace communication::messages::types;
         if(environment->team1->score > environment->team2->score){
-            return {gameModel::TeamSide::LEFT, VictoryReason::MOST_POINTS};
+            return {environment->team1->getSide(), VictoryReason::MOST_POINTS};
         } else if(environment->team1->score < environment->team2->score){
-            return {gameModel::TeamSide::RIGHT, VictoryReason::MOST_POINTS};
+            return {environment->team2->getSide(), VictoryReason::MOST_POINTS};
         } else {
             if(environment->team1->hasMember(winningPlayer)){
-                return {gameModel::TeamSide::LEFT, VictoryReason::POINTS_EQUAL_SNITCH_CATCH};
+                return {environment->team1->getSide(), VictoryReason::POINTS_EQUAL_SNITCH_CATCH};
             } else {
-                return {gameModel::TeamSide::RIGHT, VictoryReason::POINTS_EQUAL_SNITCH_CATCH};
+                return {environment->team2->getSide(), VictoryReason::POINTS_EQUAL_SNITCH_CATCH};
             }
         }
     }
