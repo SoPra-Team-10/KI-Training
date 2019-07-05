@@ -81,7 +81,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h1>KI-Training</h1>
 <p>Component for training the AI.</p>
 <h2>Usage</h2>
-<p>Pass the match config json file as the first argument.</p>
+<p>Argument 1: match config as json Argument 2: team config for left team as json Argument 3: team config for right team as json Argument 4: learning rate Argument 5: discount rate</p>
+<h4>Start training with pretrained net:</h4>
+<p>Argument 6: estimator config as json (will be used for both teams)</p>
+<h4>Using experience replay:</h4>
+<p>Argument 6: Directory with sub directories containing the experience data Argument 7: Frequency of experience epochs (every &lt;value&gt; epoch will be an experience replay epoch)</p>
+<h4>Using pretrained net and experience replay</h4>
+<p>Argument 6: estimator config as json (will be used for both teams) Argument 7: Directory with sub directories containing the experience data Argument 8: Frequency of experience epochs (every &lt;value&gt; epoch will be an experience replay epoch)</p>
 <h2>Getting started</h2>
 <p>You can choose between using Docker or manually installing all dependencies. Docker is the preferred method as it already installs the toolchain and all dependencies.</p>
 <h3>Docker</h3>

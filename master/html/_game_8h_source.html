@@ -112,64 +112,73 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    constexpr <span class="keyword">auto</span> SNITCH_SPAWN_ROUND = 10;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    constexpr <span class="keyword">auto</span> OVERTIME_INTERVAL = 3;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    constexpr <span class="keyword">auto</span> MAX_BAN_COUNT = 2;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classgame_handling_1_1_game.html">   28</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classgame_handling_1_1_game.html">Game</a> {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        std::shared_ptr&lt;gameModel::Environment&gt; environment;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <a class="code" href="classgame_handling_1_1_game.html">Game</a>(communication::messages::broadcast::MatchConfig matchConfig,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;             <span class="keyword">const</span> communication::messages::request::TeamConfig&amp; teamConfig1,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;             <span class="keyword">const</span> communication::messages::request::TeamConfig&amp; teamConfig2,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;             communication::messages::request::TeamFormation teamFormation1,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;             communication::messages::request::TeamFormation teamFormation2,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;             util::Logging &amp;log);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keyword">mutable</span> std::optional&lt;std::pair&lt;gameModel::TeamSide, communication::messages::types::VictoryReason&gt;&gt; winEvent;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_game.html#a208aa2e0f50a211db96fb90aa9134cff">getNextAction</a>() -&gt; communication::messages::broadcast::Next;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classgame_handling_1_1_game.html#a4da9f347fe8de061d0b131c2074e46fd">executeDelta</a>(communication::messages::request::DeltaRequest command, gameModel::TeamSide teamSide);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classgame_handling_1_1_game.html#a608e5ad465c8832c25669fced9b7ab45">executeBallDelta</a>(communication::messages::types::EntityId entityId);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_game.html#a0018d893e32dc96507aadfc3f51f82df">getState</a>() <span class="keyword">const</span> -&gt; aiTools::State;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        communication::messages::types::EntityId ballTurn =</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                communication::messages::types::EntityId::SNITCH; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> roundNumber = 1;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <a class="code" href="structgame_handling_1_1_timeouts.html">Timeouts</a> timeouts;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <a class="code" href="classgame_handling_1_1_phase_manager.html">PhaseManager</a> phaseManager;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        communication::messages::broadcast::Next expectedRequestType{}; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        gameModel::TeamSide currentSide; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        util::Logging &amp;log;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        gameController::ExcessLength overTimeState = gameController::ExcessLength::None;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> overTimeCounter = 0;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordtype">bool</span> goalScored = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        std::deque&lt;std::shared_ptr&lt;gameModel::Player&gt;&gt; bannedPlayers = {};</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        std::optional&lt;gameModel::TeamSide&gt; firstSideDisqualified = std::nullopt;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        std::unordered_set&lt;communication::messages::types::EntityId&gt; playersUsedLeft = {};</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        std::unordered_set&lt;communication::messages::types::EntityId&gt; playersUsedRight = {};</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keyword">auto</span> getUsedPlayers(<span class="keyword">const</span> gameModel::TeamSide &amp;side) -&gt; std::unordered_set&lt;communication::messages::types::EntityId&gt;&amp;;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keyword">auto</span> getVictoriousTeam(<span class="keyword">const</span> std::shared_ptr&lt;const gameModel::Player&gt; &amp;winningPlayer) <span class="keyword">const</span> -&gt; std::pair&lt;gameModel::TeamSide, communication::messages::types::VictoryReason&gt;;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordtype">void</span> changePhase();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    constexpr <span class="keyword">auto</span> MAX_EXP_DELAY_ROUNDS = 3;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classgame_handling_1_1_game.html">   29</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classgame_handling_1_1_game.html">Game</a> {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        std::shared_ptr&lt;gameModel::Environment&gt; environment;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <a class="code" href="classgame_handling_1_1_game.html">Game</a>(communication::messages::broadcast::MatchConfig matchConfig,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;             <span class="keyword">const</span> communication::messages::request::TeamConfig&amp; teamConfig1,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;             <span class="keyword">const</span> communication::messages::request::TeamConfig&amp; teamConfig2,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;             communication::messages::request::TeamFormation teamFormation1,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;             communication::messages::request::TeamFormation teamFormation2,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;             util::Logging &amp;log, std::string expDir);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="code" href="classgame_handling_1_1_game.html">Game</a>(communication::messages::broadcast::MatchConfig matchConfig, <span class="keyword">const</span> aiTools::State &amp;state, util::Logging &amp;log, std::string expDir);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">mutable</span> std::optional&lt;std::pair&lt;gameModel::TeamSide, communication::messages::types::VictoryReason&gt;&gt; winEvent;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_game.html#a208aa2e0f50a211db96fb90aa9134cff">getNextAction</a>() -&gt; communication::messages::broadcast::Next;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classgame_handling_1_1_game.html#a4da9f347fe8de061d0b131c2074e46fd">executeDelta</a>(communication::messages::request::DeltaRequest command, gameModel::TeamSide teamSide);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classgame_handling_1_1_game.html#a608e5ad465c8832c25669fced9b7ab45">executeBallDelta</a>(communication::messages::types::EntityId entityId);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_game.html#a0018d893e32dc96507aadfc3f51f82df">getState</a>() <span class="keyword">const</span> -&gt; aiTools::State;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classgame_handling_1_1_game.html#aaf72b7c45a73d7ff7fb3cf80c4b12959">saveExperience</a>();</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        communication::messages::types::EntityId ballTurn =</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                communication::messages::types::EntityId::SNITCH; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> roundNumber = 1;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <a class="code" href="structgame_handling_1_1_timeouts.html">Timeouts</a> timeouts;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="code" href="classgame_handling_1_1_phase_manager.html">PhaseManager</a> phaseManager;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        communication::messages::broadcast::Next expectedRequestType{}; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        gameModel::TeamSide currentSide; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        gameController::ExcessLength overTimeState = gameController::ExcessLength::None;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> overTimeCounter = 0;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordtype">bool</span> goalScored = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        std::deque&lt;std::shared_ptr&lt;gameModel::Player&gt;&gt; bannedPlayers = {};</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        std::optional&lt;gameModel::TeamSide&gt; firstSideDisqualified = std::nullopt;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        std::unordered_set&lt;communication::messages::types::EntityId&gt; playersUsedLeft = {};</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        std::unordered_set&lt;communication::messages::types::EntityId&gt; playersUsedRight = {};</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        util::Logging &amp;log;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        std::string experienceDirectory;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordtype">int</span> expDelay = 0;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordtype">void</span> endRound();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    };</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#endif //SERVER_GAME_H</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keyword">auto</span> getUsedPlayers(<span class="keyword">const</span> gameModel::TeamSide &amp;side) -&gt; std::unordered_set&lt;communication::messages::types::EntityId&gt;&amp;;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keyword">auto</span> getVictoriousTeam(<span class="keyword">const</span> std::shared_ptr&lt;const gameModel::Player&gt; &amp;winningPlayer) <span class="keyword">const</span> -&gt; std::pair&lt;gameModel::TeamSide, communication::messages::types::VictoryReason&gt;;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordtype">void</span> changePhase();</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordtype">void</span> endRound();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordtype">void</span> saveState(<span class="keyword">const</span> aiTools::State &amp;state, <span class="keyword">const</span> std::string &amp;path) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    };</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;}</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#endif //SERVER_GAME_H</span></div>
 <div class="ttc" id="structgame_handling_1_1_timeouts_html"><div class="ttname"><a href="structgame_handling_1_1_timeouts.html">gameHandling::Timeouts</a></div><div class="ttdef"><b>Definition:</b> GameTypes.h:17</div></div>
 <div class="ttc" id="classgame_handling_1_1_phase_manager_html"><div class="ttname"><a href="classgame_handling_1_1_phase_manager.html">gameHandling::PhaseManager</a></div><div class="ttdef"><b>Definition:</b> PhaseManager.h:29</div></div>
-<div class="ttc" id="classgame_handling_1_1_game_html_a4da9f347fe8de061d0b131c2074e46fd"><div class="ttname"><a href="classgame_handling_1_1_game.html#a4da9f347fe8de061d0b131c2074e46fd">gameHandling::Game::executeDelta</a></div><div class="ttdeci">bool executeDelta(communication::messages::request::DeltaRequest command, gameModel::TeamSide teamSide)</div><div class="ttdef"><b>Definition:</b> Game.cpp:114</div></div>
-<div class="ttc" id="classgame_handling_1_1_game_html_a608e5ad465c8832c25669fced9b7ab45"><div class="ttname"><a href="classgame_handling_1_1_game.html#a608e5ad465c8832c25669fced9b7ab45">gameHandling::Game::executeBallDelta</a></div><div class="ttdeci">void executeBallDelta(communication::messages::types::EntityId entityId)</div><div class="ttdef"><b>Definition:</b> Game.cpp:530</div></div>
-<div class="ttc" id="classgame_handling_1_1_game_html_a0018d893e32dc96507aadfc3f51f82df"><div class="ttname"><a href="classgame_handling_1_1_game.html#a0018d893e32dc96507aadfc3f51f82df">gameHandling::Game::getState</a></div><div class="ttdeci">auto getState() const -&gt; aiTools::State</div><div class="ttdef"><b>Definition:</b> Game.cpp:658</div></div>
-<div class="ttc" id="classgame_handling_1_1_game_html"><div class="ttname"><a href="classgame_handling_1_1_game.html">gameHandling::Game</a></div><div class="ttdef"><b>Definition:</b> Game.h:28</div></div>
-<div class="ttc" id="classgame_handling_1_1_game_html_a208aa2e0f50a211db96fb90aa9134cff"><div class="ttname"><a href="classgame_handling_1_1_game.html#a208aa2e0f50a211db96fb90aa9134cff">gameHandling::Game::getNextAction</a></div><div class="ttdeci">auto getNextAction() -&gt; communication::messages::broadcast::Next</div><div class="ttdef"><b>Definition:</b> Game.cpp:22</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html_a4da9f347fe8de061d0b131c2074e46fd"><div class="ttname"><a href="classgame_handling_1_1_game.html#a4da9f347fe8de061d0b131c2074e46fd">gameHandling::Game::executeDelta</a></div><div class="ttdeci">bool executeDelta(communication::messages::request::DeltaRequest command, gameModel::TeamSide teamSide)</div><div class="ttdef"><b>Definition:</b> Game.cpp:140</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html_a608e5ad465c8832c25669fced9b7ab45"><div class="ttname"><a href="classgame_handling_1_1_game.html#a608e5ad465c8832c25669fced9b7ab45">gameHandling::Game::executeBallDelta</a></div><div class="ttdeci">void executeBallDelta(communication::messages::types::EntityId entityId)</div><div class="ttdef"><b>Definition:</b> Game.cpp:556</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html_aaf72b7c45a73d7ff7fb3cf80c4b12959"><div class="ttname"><a href="classgame_handling_1_1_game.html#aaf72b7c45a73d7ff7fb3cf80c4b12959">gameHandling::Game::saveExperience</a></div><div class="ttdeci">void saveExperience()</div><div class="ttdef"><b>Definition:</b> Game.cpp:721</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html_a0018d893e32dc96507aadfc3f51f82df"><div class="ttname"><a href="classgame_handling_1_1_game.html#a0018d893e32dc96507aadfc3f51f82df">gameHandling::Game::getState</a></div><div class="ttdeci">auto getState() const -&gt; aiTools::State</div><div class="ttdef"><b>Definition:</b> Game.cpp:686</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html"><div class="ttname"><a href="classgame_handling_1_1_game.html">gameHandling::Game</a></div><div class="ttdef"><b>Definition:</b> Game.h:29</div></div>
+<div class="ttc" id="classgame_handling_1_1_game_html_a208aa2e0f50a211db96fb90aa9134cff"><div class="ttname"><a href="classgame_handling_1_1_game.html#a208aa2e0f50a211db96fb90aa9134cff">gameHandling::Game::getNextAction</a></div><div class="ttdeci">auto getNextAction() -&gt; communication::messages::broadcast::Next</div><div class="ttdef"><b>Definition:</b> Game.cpp:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

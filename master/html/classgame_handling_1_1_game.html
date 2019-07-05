@@ -94,9 +94,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5bd63bf595f36e5a5a21efd00d069bb9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5bd63bf595f36e5a5a21efd00d069bb9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Game</b> (communication::messages::broadcast::MatchConfig matchConfig, const communication::messages::request::TeamConfig &amp;teamConfig1, const communication::messages::request::TeamConfig &amp;teamConfig2, communication::messages::request::TeamFormation teamFormation1, communication::messages::request::TeamFormation teamFormation2, util::Logging &amp;log)</td></tr>
-<tr class="separator:a5bd63bf595f36e5a5a21efd00d069bb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefdce8f90a839dfcc971b8803de31ba9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefdce8f90a839dfcc971b8803de31ba9"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Game</b> (communication::messages::broadcast::MatchConfig matchConfig, const communication::messages::request::TeamConfig &amp;teamConfig1, const communication::messages::request::TeamConfig &amp;teamConfig2, communication::messages::request::TeamFormation teamFormation1, communication::messages::request::TeamFormation teamFormation2, util::Logging &amp;log, std::string expDir)</td></tr>
+<tr class="separator:aefdce8f90a839dfcc971b8803de31ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad997e433ce760b39fcc6735e9e39136c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgame_handling_1_1_game.html#ad997e433ce760b39fcc6735e9e39136c">Game</a> (communication::messages::broadcast::MatchConfig matchConfig, const aiTools::State &amp;state, util::Logging &amp;log, std::string expDir)</td></tr>
+<tr class="separator:ad997e433ce760b39fcc6735e9e39136c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a208aa2e0f50a211db96fb90aa9134cff"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgame_handling_1_1_game.html#a208aa2e0f50a211db96fb90aa9134cff">getNextAction</a> () -&gt; communication::messages::broadcast::Next</td></tr>
 <tr class="separator:a208aa2e0f50a211db96fb90aa9134cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4da9f347fe8de061d0b131c2074e46fd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgame_handling_1_1_game.html#a4da9f347fe8de061d0b131c2074e46fd">executeDelta</a> (communication::messages::request::DeltaRequest command, gameModel::TeamSide teamSide)</td></tr>
@@ -105,6 +107,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a608e5ad465c8832c25669fced9b7ab45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0018d893e32dc96507aadfc3f51f82df"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgame_handling_1_1_game.html#a0018d893e32dc96507aadfc3f51f82df">getState</a> () const -&gt; aiTools::State</td></tr>
 <tr class="separator:a0018d893e32dc96507aadfc3f51f82df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf72b7c45a73d7ff7fb3cf80c4b12959"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgame_handling_1_1_game.html#aaf72b7c45a73d7ff7fb3cf80c4b12959">saveExperience</a> ()</td></tr>
+<tr class="separator:aaf72b7c45a73d7ff7fb3cf80c4b12959"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
@@ -118,6 +122,54 @@ std::optional&lt; std::pair<br class="typebreak"/>
 communication::messages::types::VictoryReason &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>winEvent</b></td></tr>
 <tr class="separator:aaebcdb815c7e2a154783729254bd31e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ad997e433ce760b39fcc6735e9e39136c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">gameHandling::Game::Game </td>
+          <td>(</td>
+          <td class="paramtype">communication::messages::broadcast::MatchConfig&#160;</td>
+          <td class="paramname"><em>matchConfig</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const aiTools::State &amp;&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">util::Logging &amp;&#160;</td>
+          <td class="paramname"><em>log</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>expDir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constructs a game from a saved experience </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expFile</td><td>file to load the experience from </td></tr>
+    <tr><td class="paramname">log</td><td>logging instance </td></tr>
+    <tr><td class="paramname">expPath</td><td>directory to save the new experiences to </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a608e5ad465c8832c25669fced9b7ab45"></a>
 <div class="memitem">
@@ -208,6 +260,22 @@ communication::messages::types::VictoryReason &gt; &gt;&#160;</td><td class="mem
 </div><div class="memdoc">
 <p>Gets a copy of the current game state </p>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aaf72b7c45a73d7ff7fb3cf80c4b12959"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gameHandling::Game::saveExperience </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Saves the current State if certain conditions are met </p>
 
 </div>
 </div>
