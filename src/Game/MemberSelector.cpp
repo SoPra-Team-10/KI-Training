@@ -6,7 +6,7 @@
 #include <SopraGameLogic/GameController.h>
 #include <SopraGameLogic/conversions.h>
 namespace gameHandling{
-    MemberSelector::MemberSelector(const std::shared_ptr<gameModel::Team> &team, gameModel::TeamSide side) : team(team), side(side){
+    MemberSelector::MemberSelector(const std::shared_ptr<gameModel::Team> &team) : team(team){
         resetPlayers();
         resetInterferences();
     }
@@ -33,7 +33,7 @@ namespace gameHandling{
             interferencesLeft.erase(pos);
         }
 
-        return gameLogic::conversions::interferenceToId(ret, side);
+        return gameLogic::conversions::interferenceToId(ret, team->getSide());
     }
 
     bool MemberSelector::hasPlayers() const {
@@ -71,7 +71,7 @@ namespace gameHandling{
         }
 
         for(const auto &player: playersLeft){
-            if(player->id == id){
+            if(player->getId() == id){
                 return false;
             }
         }
@@ -92,5 +92,9 @@ namespace gameHandling{
         }
 
         return team->fanblock.getUses(type);
+    }
+
+    auto MemberSelector::getSide() const -> gameModel::TeamSide {
+        return team->getSide();
     }
 }

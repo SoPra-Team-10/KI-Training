@@ -51,12 +51,12 @@ namespace ai{
 
                 bool canScoreGoal = false;
                 if(!myTeam->keeper->isFined && !myTeam->keeper->knockedOut &&
-                    gameController::getDistance(state.env->quaffle->position, myTeam->keeper->position) <= 2 && !contains(myTeam->keeper->id)){
+                    gameController::getDistance(state.env->quaffle->position, myTeam->keeper->position) <= 2 && !contains(myTeam->keeper->getId())){
                     canScoreGoal = true;
                 } else {
                     for(const auto &chaser : myTeam->chasers){
                         if(!chaser->isFined && !chaser->knockedOut &&
-                            gameController::getDistance(state.env->quaffle->position, chaser->position) <= 2 && !contains(chaser->id)){
+                            gameController::getDistance(state.env->quaffle->position, chaser->position) <= 2 && !contains(chaser->getId())){
                             canScoreGoal = true;
                             break;
                         }
@@ -105,7 +105,7 @@ namespace ai{
                 *it++ = player->position.y;
                 bool used = false;
                 for(const auto &id : usedPlayers){
-                    if(player->id == id){
+                    if(player->getId() == id){
                         used = true;
                         break;
                     }

@@ -24,6 +24,7 @@ namespace gameHandling {
     constexpr auto SNITCH_SPAWN_ROUND = 10;
     constexpr auto OVERTIME_INTERVAL = 3;
     constexpr auto MAX_BAN_COUNT = 2;
+    constexpr auto MAX_EXP_DELAY_ROUNDS = 3;
 
     class Game {
     public:
@@ -33,7 +34,15 @@ namespace gameHandling {
              const communication::messages::request::TeamConfig& teamConfig2,
              communication::messages::request::TeamFormation teamFormation1,
              communication::messages::request::TeamFormation teamFormation2,
-             util::Logging &log);
+             util::Logging &log, std::string expDir);
+
+        /**
+         * Constructs a game from a saved experience
+         * @param expFile file to load the experience from
+         * @param log logging instance
+         * @param expPath directory to save the new experiences to
+         */
+        Game(communication::messages::broadcast::MatchConfig matchConfig, const aiTools::State &state, util::Logging &log, std::string expDir);
 
         mutable std::optional<std::pair<gameModel::TeamSide, communication::messages::types::VictoryReason>> winEvent;
 
@@ -63,6 +72,10 @@ namespace gameHandling {
          */
         auto getState() const -> aiTools::State;
 
+        /**
+         * Saves the current State if certain conditions are met
+         */
+        void saveExperience();
     private:
         communication::messages::types::PhaseType currentPhase = communication::messages::types::PhaseType::BALL_PHASE; ///< the basic game phases
         communication::messages::types::EntityId ballTurn =
@@ -72,7 +85,6 @@ namespace gameHandling {
         PhaseManager phaseManager;
         communication::messages::broadcast::Next expectedRequestType{}; ///<Next-object containing information about the next expected request from a client
         gameModel::TeamSide currentSide; ///<Current side to make a move
-        util::Logging &log;
         gameController::ExcessLength overTimeState = gameController::ExcessLength::None;
         unsigned int overTimeCounter = 0;
         bool goalScored = false;
@@ -80,6 +92,9 @@ namespace gameHandling {
         std::optional<gameModel::TeamSide> firstSideDisqualified = std::nullopt;
         std::unordered_set<communication::messages::types::EntityId> playersUsedLeft = {};
         std::unordered_set<communication::messages::types::EntityId> playersUsedRight = {};
+        util::Logging &log;
+        std::string experienceDirectory;
+        int expDelay = 0;
 
         auto getUsedPlayers(const gameModel::TeamSide &side) -> std::unordered_set<communication::messages::types::EntityId>&;
 
@@ -100,6 +115,13 @@ namespace gameHandling {
          * Prepares the game state for the next round.
          */
         void endRound();
+
+        /**
+         * Saves a game state to the specified directory
+         * @param state The state to be saved
+         * @param path path to directory where state is to be saved
+         */
+        void saveState(const aiTools::State &state, const std::string &path) const;
     };
 }
 

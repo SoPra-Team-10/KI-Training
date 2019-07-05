@@ -3,7 +3,23 @@
 Component for training the AI.
 
 ## Usage
-Pass the match config json file as the first argument.
+Argument 1: match config as json
+Argument 2: team config for left team as json
+Argument 3: team config for right team as json
+Argument 4: learning rate
+Argument 5: discount rate
+
+#### Start training with pretrained net: ####
+Argument 6: estimator config as json (will be used for both teams)
+
+#### Using experience replay: ####
+Argument 6: Directory with sub directories containing the experience data
+Argument 7: Frequency of experience epochs (every \<value\> epoch will be an experience replay epoch)
+
+#### Using pretrained net and experience replay ####
+Argument 6: estimator config as json (will be used for both teams)
+Argument 7: Directory with sub directories containing the experience data
+Argument 8: Frequency of experience epochs (every \<value\> epoch will be an experience replay epoch)
 
 ## Getting started
 You can choose between using Docker or manually installing all dependencies.

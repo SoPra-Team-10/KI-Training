@@ -15,7 +15,7 @@
 namespace gameHandling{
     class MemberSelector {
     public:
-        MemberSelector(const std::shared_ptr<gameModel::Team> &team, gameModel::TeamSide side);
+        explicit MemberSelector(const std::shared_ptr<gameModel::Team> &team);
 
         /**
          *
@@ -69,9 +69,14 @@ namespace gameHandling{
          */
         void resetInterferences();
 
+        /**
+         * Getter
+         * @return the Teamside of the managed Team
+         */
+        auto getSide() const -> gameModel::TeamSide;
+
     private:
         std::shared_ptr<const gameModel::Team> team; ///<The immutable Team used to reset the internal state of the MemberSelector
-        const gameModel::TeamSide side; ///<The Side the Team belongs to
         std::deque<std::shared_ptr<gameModel::Player>> playersLeft; ///<List with all currently available Players
         std::deque<std::pair<gameModel::InterferenceType, int>> interferencesLeft; ///<List with all currently available Interferences and their respective uses
 
