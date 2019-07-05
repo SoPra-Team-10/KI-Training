@@ -69,7 +69,7 @@ void communication::Communicator::run(const std::pair<ml::Mlp<aiTools::State::FE
         next = game.getNextAction();
         ais.first.update(game.getState(), std::nullopt, lastTeamSide);
         ais.second.update(game.getState(), std::nullopt,lastTeamSide);
-        game.saveExperience();
+        //game.saveExperience();
     }
     auto winTuple = game.winEvent.value();
 

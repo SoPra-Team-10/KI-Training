@@ -632,9 +632,11 @@ namespace gameHandling{
                 winEvent.emplace(winningTeam.first, VictoryReason::BOTH_DISQUALIFICATION_MOST_POINTS);
             }
         } else if(environment->team1->numberOfBannedMembers() > MAX_BAN_COUNT) {
-            winEvent.emplace(gameModel::TeamSide::RIGHT, VictoryReason::DISQUALIFICATION);
+            auto winningSide = environment->team1->getSide() == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
+            winEvent.emplace(winningSide, VictoryReason::DISQUALIFICATION);
         } else if(environment->team2->numberOfBannedMembers() > MAX_BAN_COUNT) {
-            winEvent.emplace(gameModel::TeamSide::LEFT, VictoryReason::DISQUALIFICATION);
+            auto winningSide = environment->team2->getSide() == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
+            winEvent.emplace(winningSide, VictoryReason::DISQUALIFICATION);
         }
 
         if(roundNumber == SNITCH_SPAWN_ROUND){

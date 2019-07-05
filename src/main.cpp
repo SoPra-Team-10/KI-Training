@@ -32,6 +32,15 @@ auto readFromFileToJson(const std::string &fname) -> T {
     return t;
 }
 
+// stolen from https://stackoverflow.com/questions/5043403/listing-only-folders-in-directory
+std::vector<std::string> get_directories(const std::string& s){
+    std::vector<std::string> r;
+    for(auto& p : std::filesystem::recursive_directory_iterator(s))
+        if(p.status().type() == std::filesystem::file_type::directory)
+            r.push_back(p.path().string());
+    return r;
+}
+
 int main(int argc, char *argv[]) {
     using namespace communication;
     if (argc != 6 && argc != 7 && argc != 8 && argc != 9) {
@@ -44,21 +53,22 @@ int main(int argc, char *argv[]) {
     std::string rightTeamConfigPath{argv[3]};
     auto learningRate = std::stod(argv[4]);
     auto discountRate = std::stod(argv[5]);
-    std::optional<std::string> expDir;
+    std::optional<std::vector<std::string>> expDirList;
     std::optional<int> expEpochs;
     std::optional<std::filesystem::directory_iterator> expDirIt;
     std::optional<std::string> pretrainedNet;
+    bool expReplayEnabled = false;
+    std::vector<std::string>::iterator dirListIt;
+
     if(argc == 7) {
         pretrainedNet.emplace(argv[6]);
     } else if(argc == 8) {
-        expDir.emplace(argv[6]);
+        expDirList.emplace(get_directories(argv[6]));
         expEpochs.emplace(std::stoi(argv[7]));
-        expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
     } else if(argc == 9) {
         pretrainedNet.emplace(argv[6]);
-        expDir.emplace(argv[7]);
+        expDirList.emplace(get_directories(argv[7]));
         expEpochs.emplace(std::stoi(argv[8]));
-        expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
     }
 
     auto matchConfig = readFromFileToJson<messages::broadcast::MatchConfig>(matchConfigPath);
@@ -85,34 +95,44 @@ int main(int argc, char *argv[]) {
         log.info("No directory for experience replay specified");
     }
 
-    if(expDirIt.has_value() && *expDirIt == std::filesystem::end(*expDirIt)){
-        log.warn("No experiences found in " + *expDir);
+    if(expDirList.has_value() && expDirList->empty()){
+        log.warn("No experiences found in " + std::string(argv[7]));
+    } else {
+        log.warn("Found " + std::to_string(expDirList->size()) + " directories in " + std::string(argv[7]));
+        expReplayEnabled = true;
+        dirListIt = expDirList->begin();
+        expDirIt = std::filesystem::directory_iterator(*dirListIt);
     }
 
 
     for (auto epoch = 0; epoch < std::numeric_limits<int>::max(); ++epoch) {
         std::unique_ptr<Communicator> communicator;
-        if(expEpochs.has_value() && epoch % *expEpochs == 0){
-            if(*expDirIt == std::filesystem::end(*expDirIt)){
-                log.warn("--- No experience left, resetting ---");
-                expDirIt.emplace(std::filesystem::directory_iterator(*expDir));
+        if(expReplayEnabled && epoch % *expEpochs == 0){
+            if(*expDirIt == std::filesystem::end(*expDirIt)) {
+                if(++dirListIt == expDirList->end()){
+                    log.warn("--- No experience left, resetting ---");
+                    std::exit(0);
+                    dirListIt = expDirList->begin();
+                }
+
+                log.warn("--- Current experience exhausted, fetching next directory ---");
+                expDirIt.emplace(std::filesystem::directory_iterator(*dirListIt));
             }
 
             log.warn("--- Experience replay epoch ---");
             auto state = readFromFileToJson<aiTools::State>(expDirIt.value()->path().string());
-            communicator = std::make_unique<Communicator>(matchConfig, state, log, learningRate, discountRate, *mlps, "NewExperiences/");
+            communicator = std::make_unique<Communicator>(matchConfig, state, log, learningRate, discountRate, *mlps, "---");
             ++(*expDirIt);
 
         } else {
             communicator = std::make_unique<Communicator>(matchConfig, leftTeamConfig, rightTeamConfig, log, learningRate,
-                                                 discountRate, *mlps, "NewExperiences/");
+                                                 discountRate, *mlps, "---");
         }
 
         mlps = std::make_unique<decltype(communicator->mlps)>(communicator->mlps);
-
         log.warn("Epoch finished: " + std::to_string(epoch));
 
-        if (epoch % 100000 == 0) {
+        if (epoch % 10000 == 0) {
             ml::util::saveToFile(std::string{"trainingFiles/left_epoch"} + std::to_string(epoch) + std::string{".json"},
                                  mlps->first);
             ml::util::saveToFile(
