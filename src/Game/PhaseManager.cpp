@@ -6,10 +6,9 @@
 #include <SopraGameLogic/conversions.h>
 
 namespace gameHandling{
-    PhaseManager::PhaseManager(const std::shared_ptr<gameModel::Team> &teamLeft,
-             const std::shared_ptr<gameModel::Team> &teamRight, std::shared_ptr<const gameModel::Environment> env,
-             Timeouts timeouts) : teamLeft(teamLeft, gameModel::TeamSide::LEFT), teamRight(teamRight, gameModel::TeamSide::RIGHT), env(std::move(env)),
-             timeouts(timeouts){
+    PhaseManager::PhaseManager(const std::shared_ptr<gameModel::Team> &team1,
+             const std::shared_ptr<gameModel::Team> &team2, std::shared_ptr<const gameModel::Environment> env,
+             Timeouts timeouts) : team1(team1), team2(team2), env(std::move(env)), timeouts(timeouts){
         chooseSide(currentSidePlayers);
         chooseSide(currentSideInter);
     }
@@ -76,14 +75,14 @@ namespace gameHandling{
                     playerTurnState = PlayerTurnState::PossibleAction;
                 }
 
-                return broadcast::Next{currentPlayer.value()->id, types::TurnType::MOVE, timeouts.playerTurn};
+                return broadcast::Next{currentPlayer.value()->getId(), types::TurnType::MOVE, timeouts.playerTurn};
             case PlayerTurnState::ExtraMove:
                 playerTurnState = PlayerTurnState::PossibleAction;
-                return broadcast::Next{currentPlayer.value()->id, types::TurnType::MOVE, timeouts.playerTurn};
+                return broadcast::Next{currentPlayer.value()->getId(), types::TurnType::MOVE, timeouts.playerTurn};
             case PlayerTurnState::PossibleAction:
                 playerTurnState = PlayerTurnState::Move;
                 if(gameController::playerCanPerformAction(currentPlayer.value(), env)){
-                    auto id = currentPlayer.value()->id;
+                    auto id = currentPlayer.value()->getId();
                     currentPlayer.reset();
                     return broadcast::Next{id, types::TurnType::ACTION, timeouts.playerTurn};
                 } else {
@@ -131,23 +130,23 @@ namespace gameHandling{
     }
 
     void PhaseManager::resetPlayers() {
-        teamRight.resetPlayers();
-        teamLeft.resetPlayers();
+        team1.resetPlayers();
+        team2.resetPlayers();
         chooseSide(currentSidePlayers);
         teamStatePlayers = TeamState::BothAvailable;
     }
 
     void PhaseManager::resetInterferences() {
-        teamRight.resetInterferences();
-        teamLeft.resetInterferences();
-        if(teamRight.hasInterference() && teamLeft.hasInterference()){
+        team2.resetInterferences();
+        team1.resetInterferences();
+        if(team2.hasInterference() && team1.hasInterference()){
             chooseSide(currentSideInter);
             teamStateInterferences = TeamState::BothAvailable;
-        } else if(teamLeft.hasInterference()){
-            currentSideInter = gameModel::TeamSide::LEFT;
+        } else if(team1.hasInterference()){
+            currentSideInter = team1.getSide();
             teamStateInterferences = TeamState::OneEmpty;
-        } else if(teamRight.hasInterference()){
-            currentSideInter = gameModel::TeamSide::RIGHT;
+        } else if(team2.hasInterference()){
+            currentSideInter = team2.getSide();
             teamStateInterferences = TeamState::OneEmpty;
         }else {
             teamStateInterferences = TeamState::BothEmpty;
@@ -161,19 +160,11 @@ namespace gameHandling{
 
 
     auto PhaseManager::getTeam(gameModel::TeamSide side) -> MemberSelector & {
-        if(side == gameModel::TeamSide::LEFT){
-            return teamLeft;
-        } else {
-            return teamRight;
-        }
+        return team1.getSide() == side ? team1 : team2;
     }
 
     auto PhaseManager::getTeam(gameModel::TeamSide side) const -> const MemberSelector & {
-        if(side == gameModel::TeamSide::LEFT){
-            return teamLeft;
-        } else {
-            return teamRight;
-        }
+        return team1.getSide() == side ? team1 : team2;
     }
 
     void PhaseManager::chooseSide(gameModel::TeamSide &side) const{
@@ -185,11 +176,11 @@ namespace gameHandling{
     }
 
     int PhaseManager::interferencesUsedLeft(communication::messages::types::FanType type) const {
-        return teamLeft.usedInterferences(type);
+        return getTeam(gameModel::TeamSide::LEFT).usedInterferences(type);
     }
 
     int PhaseManager::interferencesUsedRight(communication::messages::types::FanType type) const {
-        return teamRight.usedInterferences(type);
+        return getTeam(gameModel::TeamSide::RIGHT).usedInterferences(type);
     }
 
     void PhaseManager::switchSide(gameModel::TeamSide &side) {
@@ -197,12 +188,12 @@ namespace gameHandling{
     }
 
     bool PhaseManager::playerUsed(const std::shared_ptr<const gameModel::Player> &player) const {
-        auto &team = getTeam(gameLogic::conversions::idToSide(player->id));
-        return team.playerUsed(player->id) && (currentPlayer != player || (playerTurnState == PlayerTurnState::PossibleAction &&
+        auto &team = getTeam(gameLogic::conversions::idToSide(player->getId()));
+        return team.playerUsed(player->getId()) && (currentPlayer != player || (playerTurnState == PlayerTurnState::PossibleAction &&
             !gameController::playerCanPerformAction(player, env)));
     }
 
     bool PhaseManager::hasInterference() const{
-        return teamLeft.hasInterference() || teamRight.hasInterference();
+        return team1.hasInterference() || team2.hasInterference();
     }
 }

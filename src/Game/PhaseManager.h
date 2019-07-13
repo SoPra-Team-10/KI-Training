@@ -28,8 +28,8 @@ namespace gameHandling{
 
     class PhaseManager {
     public:
-        PhaseManager(const std::shared_ptr<gameModel::Team> &teamLeft,
-                     const std::shared_ptr<gameModel::Team> &teamRight,
+        PhaseManager(const std::shared_ptr<gameModel::Team> &team1,
+                     const std::shared_ptr<gameModel::Team> &team2,
                      std::shared_ptr<const gameModel::Environment> env, Timeouts timeouts);
 
         /**
@@ -87,7 +87,7 @@ namespace gameHandling{
         bool playerUsed(const std::shared_ptr<const gameModel::Player> &player) const;
 
     private:
-        MemberSelector teamLeft, teamRight; ///< Member selectors for both teams
+        MemberSelector team1, team2; ///< Member selectors for both teams
         const std::shared_ptr<const gameModel::Environment> env; ///<The immutable environment for rule checks
         gameModel::TeamSide currentSidePlayers, currentSideInter; ///< The current sides for Interferences and Players
         std::optional<std::shared_ptr<gameModel::Player>> currentPlayer; ///<Current Player to make a move

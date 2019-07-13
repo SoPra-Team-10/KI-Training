@@ -24,8 +24,11 @@ namespace ai {
         /**
          * Updates the internal State
          * @param state new State
+         * @param winningSide TeamSide of the winning team if game ended, nullopt otherwise
+         * @param side TeamSide of the team that was responsible for the last action, nullopt if not during player phase
          */
-        void update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide);
+        void update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide,
+                const std::optional<gameModel::TeamSide> &side);
 
         /**
          * Returns the AIs next action

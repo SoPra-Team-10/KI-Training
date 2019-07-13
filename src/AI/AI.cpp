@@ -7,13 +7,16 @@
 namespace ai{
     constexpr auto winReward = 1;
     constexpr auto goalReward = 0.2;
+    constexpr auto possibleDisqReward = 0.5;
+    constexpr auto possibleWinReward = 0.5;
     AI::AI(const std::shared_ptr<gameModel::Environment> &env, gameModel::TeamSide mySide, double learningRate,
            double discountRate, util::Logging log) : stateEstimator(ml::functions::relu, ml::functions::relu, ml::functions::identity),
            currentState{env, 1, communication::messages::types::PhaseType::BALL_PHASE, gameController::ExcessLength::None,
                      0, false, {}, {}, {}, {}}, mySide(mySide),
                                                      learningRate(learningRate), discountRate(discountRate), log(log) {}
 
-    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide) {
+    void AI::update(const aiTools::State &state, const std::optional<gameModel::TeamSide> &winningSide,
+            const std::optional<gameModel::TeamSide> &side) {
         double reward = 0;
         auto opponentSide = mySide == gameModel::TeamSide::LEFT ? gameModel::TeamSide::RIGHT : gameModel::TeamSide::LEFT;
         if(winningSide.has_value()){
@@ -30,6 +33,51 @@ namespace ai{
             } else if(opponentDiff >= gameController::GOAL_POINTS){
                 reward = -goalReward;
             }
+
+
+            auto myTeam = state.env->getTeam(mySide);
+            if(myTeam->numberOfBannedMembers() == 3 && currentState.env->getTeam(mySide)->numberOfBannedMembers() == 2 &&
+                !state.goalScoredThisRound) {
+                const auto &usedPlayers = mySide == gameModel::TeamSide::LEFT ? state.playersUsedLeft : state.playersUsedRight;
+                auto contains = [&usedPlayers](communication::messages::types::EntityId playerId){
+                    for(const auto &id : usedPlayers){
+                        if(id == playerId){
+                            return true;
+                        }
+                    }
+
+                    return false;
+                };
+
+                bool canScoreGoal = false;
+                if(!myTeam->keeper->isFined && !myTeam->keeper->knockedOut &&
+                    gameController::getDistance(state.env->quaffle->position, myTeam->keeper->position) <= 2 && !contains(myTeam->keeper->getId())){
+                    canScoreGoal = true;
+                } else {
+                    for(const auto &chaser : myTeam->chasers){
+                        if(!chaser->isFined && !chaser->knockedOut &&
+                            gameController::getDistance(state.env->quaffle->position, chaser->position) <= 2 && !contains(chaser->getId())){
+                            canScoreGoal = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(!canScoreGoal){
+                    reward -= winReward;
+                } else {
+                    reward -= possibleDisqReward;
+                }
+            }
+
+            if(!myTeam->seeker->isFined && myTeam->seeker->position == state.env->snitch->position){
+                auto scoreDiff = myTeam->score - state.env->getTeam(opponentSide)->score;
+                if(scoreDiff >= -gameController::SNITCH_POINTS) {
+                    reward += state.overtimeState == gameController::ExcessLength::None ? possibleWinReward : winReward;
+                } else {
+                    reward -= state.overtimeState == gameController::ExcessLength::None ? possibleWinReward : winReward;
+                }
+            }
         }
 
         auto tdErrorFun = [&reward, &state, this](const std::array<double, 1> &out, const std::array<double, 1> &){
@@ -38,9 +86,12 @@ namespace ai{
             return tdError;
         };
 
-        auto stringSide = mySide == gameModel::TeamSide::LEFT ? "left: " : "right: ";
-        auto loss = stateEstimator.train({currentState.getFeatureVec(mySide)}, {{0}}, std::numeric_limits<double>::infinity(), tdErrorFun, learningRate);
-        log.info(std::string("Loss ") + stringSide + std::to_string(loss));
+        if(currentState.currentPhase == communication::messages::types::PhaseType::PLAYER_PHASE && side.has_value() && *side == mySide){
+            auto stringSide = mySide == gameModel::TeamSide::LEFT ? "left: " : "right: ";
+            auto loss = stateEstimator.train({currentState.getFeatureVec(mySide)}, {{0}}, std::numeric_limits<double>::infinity(), tdErrorFun, learningRate);
+            log.info(std::string("Loss ") + stringSide + std::to_string(loss));
+        }
+
         this->currentState = state;
     }
 
@@ -54,7 +105,7 @@ namespace ai{
                 *it++ = player->position.y;
                 bool used = false;
                 for(const auto &id : usedPlayers){
-                    if(player->id == id){
+                    if(player->getId() == id){
                         used = true;
                         break;
                     }
@@ -119,7 +170,7 @@ namespace ai{
         switch (next.getTurnType()){
             case communication::messages::types::TurnType::MOVE:
                 log.info("Move requested");
-                return aiTools::computeBestMove(currentState, evalFun, next.getEntityId());
+                return aiTools::computeBestMove(currentState, evalFun, next.getEntityId(), false);
             case communication::messages::types::TurnType::ACTION:{
                 auto type = gameController::getPossibleBallActionType(currentState.env->getPlayerById(next.getEntityId()), currentState.env);
                 if(!type.has_value()){
@@ -128,7 +179,7 @@ namespace ai{
 
                 if(*type == gameController::ActionType::Throw) {
                     log.info("Throw requested");
-                    return aiTools::computeBestShot(currentState, evalFun, next.getEntityId());
+                    return aiTools::computeBestShot(currentState, evalFun, next.getEntityId(), false);
                 } else if(*type == gameController::ActionType::Wrest) {
                     log.info("Wrest requested");
                     return aiTools::computeBestWrest(currentState, evalFun, next.getEntityId());
@@ -140,7 +191,7 @@ namespace ai{
                 return aiTools::getNextFanTurn(currentState, next);
             case communication::messages::types::TurnType::REMOVE_BAN:
                 log.info("Unban requested");
-                return aiTools::redeployPlayer(currentState, evalFun, next.getEntityId());
+                return aiTools::redeployPlayer(currentState, evalFun, next.getEntityId(), false);
             default:
                 throw std::runtime_error("Enum out of bounds");
         }
