@@ -103,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>gameHandling{</div>
 <div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classgame_handling_1_1_member_selector.html">   16</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classgame_handling_1_1_member_selector.html">MemberSelector</a> {</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <a class="code" href="classgame_handling_1_1_member_selector.html">MemberSelector</a>(<span class="keyword">const</span> std::shared_ptr&lt;gameModel::Team&gt; &amp;team, gameModel::TeamSide side);</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="classgame_handling_1_1_member_selector.html">MemberSelector</a>(<span class="keyword">const</span> std::shared_ptr&lt;gameModel::Team&gt; &amp;team);</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_member_selector.html#aa30bf8187cf7822b4f8a453804c312f0">getNextPlayer</a>() -&gt; std::shared_ptr&lt;gameModel::Player&gt;;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
@@ -121,26 +121,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classgame_handling_1_1_member_selector.html#ac9f74d185653dfd2189c92048d7790ae">resetInterferences</a>();</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        std::shared_ptr&lt;const gameModel::Team&gt; team; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keyword">const</span> gameModel::TeamSide side; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        std::deque&lt;std::shared_ptr&lt;gameModel::Player&gt;&gt; playersLeft; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        std::deque&lt;std::pair&lt;gameModel::InterferenceType, int&gt;&gt; interferencesLeft; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keyword">auto</span> <a class="code" href="classgame_handling_1_1_member_selector.html#a6c49c9a05d9d12012f8824295a65eb31">getSide</a>() <span class="keyword">const</span> -&gt; gameModel::TeamSide;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keyword">auto</span> selectRandom(std::deque&lt;T&gt; &amp;list) <span class="keyword">const</span> -&gt; <span class="keyword">typename</span> std::deque&lt;T&gt;::iterator;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    };</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keyword">auto</span> MemberSelector::selectRandom(std::deque&lt;T&gt; &amp;list) <span class="keyword">const</span> -&gt; <span class="keyword">typename</span> std::deque&lt;T&gt;::iterator {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordtype">int</span> index = gameController::rng(0, static_cast&lt;int&gt;(list.size()) - 1);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">return</span> list.begin() + index;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        std::shared_ptr&lt;const gameModel::Team&gt; team; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        std::deque&lt;std::shared_ptr&lt;gameModel::Player&gt;&gt; playersLeft; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        std::deque&lt;std::pair&lt;gameModel::InterferenceType, int&gt;&gt; interferencesLeft; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keyword">auto</span> selectRandom(std::deque&lt;T&gt; &amp;list) <span class="keyword">const</span> -&gt; <span class="keyword">typename</span> std::deque&lt;T&gt;::iterator;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    };</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">auto</span> MemberSelector::selectRandom(std::deque&lt;T&gt; &amp;list) <span class="keyword">const</span> -&gt; <span class="keyword">typename</span> std::deque&lt;T&gt;::iterator {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordtype">int</span> index = gameController::rng(0, static_cast&lt;int&gt;(list.size()) - 1);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">return</span> list.begin() + index;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classgame_handling_1_1_member_selector_html_a655bfceb29386c1bbd4d6c3459ae1afc"><div class="ttname"><a href="classgame_handling_1_1_member_selector.html#a655bfceb29386c1bbd4d6c3459ae1afc">gameHandling::MemberSelector::resetPlayers</a></div><div class="ttdeci">void resetPlayers()</div><div class="ttdef"><b>Definition:</b> MemberSelector.cpp:47</div></div>
+<div class="ttc" id="classgame_handling_1_1_member_selector_html_a6c49c9a05d9d12012f8824295a65eb31"><div class="ttname"><a href="classgame_handling_1_1_member_selector.html#a6c49c9a05d9d12012f8824295a65eb31">gameHandling::MemberSelector::getSide</a></div><div class="ttdeci">auto getSide() const -&gt; gameModel::TeamSide</div><div class="ttdef"><b>Definition:</b> MemberSelector.cpp:97</div></div>
 <div class="ttc" id="classgame_handling_1_1_member_selector_html_a54d40d21116b393eac34a1549c63150e"><div class="ttname"><a href="classgame_handling_1_1_member_selector.html#a54d40d21116b393eac34a1549c63150e">gameHandling::MemberSelector::usedInterferences</a></div><div class="ttdeci">int usedInterferences(communication::messages::types::FanType type) const </div><div class="ttdef"><b>Definition:</b> MemberSelector.cpp:82</div></div>
 <div class="ttc" id="classgame_handling_1_1_member_selector_html_a12f84cf8f75168ea31d84a66d2b046a8"><div class="ttname"><a href="classgame_handling_1_1_member_selector.html#a12f84cf8f75168ea31d84a66d2b046a8">gameHandling::MemberSelector::getNextInterference</a></div><div class="ttdeci">auto getNextInterference() -&gt; communication::messages::types::EntityId</div><div class="ttdef"><b>Definition:</b> MemberSelector.cpp:25</div></div>
 <div class="ttc" id="classgame_handling_1_1_member_selector_html_abb704adf25e2a72059415cf81f9192bd"><div class="ttname"><a href="classgame_handling_1_1_member_selector.html#abb704adf25e2a72059415cf81f9192bd">gameHandling::MemberSelector::hasInterference</a></div><div class="ttdeci">bool hasInterference() const </div><div class="ttdef"><b>Definition:</b> MemberSelector.cpp:43</div></div>
