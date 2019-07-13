@@ -710,12 +710,10 @@ namespace gameHandling{
     void Game::saveState(const aiTools::State &state, const std::string &path) const {
         nlohmann::json j;
         j = state;
-        auto data = j.dump();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch());
         std::ofstream file(path + "state_" + std::to_string(ms.count()) + ".json");
-        file << data;
-        file.close();
+        file << j.dump();
     }
 
     void Game::saveExperience() {
