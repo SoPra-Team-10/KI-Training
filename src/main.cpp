@@ -115,7 +115,6 @@ int main(int argc, char *argv[]) {
             if(*expDirIt == std::filesystem::end(*expDirIt)) {
                 if(++dirListIt == expDirList->end()){
                     log.warn("--- No experience left, resetting ---");
-                    std::exit(0);
                     dirListIt = expDirList->begin();
                 }
 
