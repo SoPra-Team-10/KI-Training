@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
     auto rightTeamConfig = readFromFileToJson<messages::request::TeamConfig>(rightTeamConfigPath);
 
     util::Logging log{std::cout, 4};
-    log.info("Halloooo");
 
     std::unique_ptr<std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>> mlps;
