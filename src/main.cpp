@@ -35,9 +35,12 @@ auto readFromFileToJson(const std::string &fname) -> T {
 // stolen from https://stackoverflow.com/questions/5043403/listing-only-folders-in-directory
 std::vector<std::string> get_directories(const std::string& s){
     std::vector<std::string> r;
-    for(auto& p : std::filesystem::recursive_directory_iterator(s))
-        if(p.status().type() == std::filesystem::file_type::directory)
+    for(auto& p : std::filesystem::recursive_directory_iterator(s)){
+        if(p.status().type() == std::filesystem::file_type::directory){
             r.push_back(p.path().string());
+        }
+    }
+
     return r;
 }
 
@@ -75,7 +78,7 @@ int main(int argc, char *argv[]) {
     auto leftTeamConfig = readFromFileToJson<messages::request::TeamConfig>(leftTeamConfiPath);
     auto rightTeamConfig = readFromFileToJson<messages::request::TeamConfig>(rightTeamConfigPath);
 
-    util::Logging log{std::cout, 2};
+    util::Logging log{std::cout, 4};
 
     std::unique_ptr<std::pair<ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>,
             ml::Mlp<aiTools::State::FEATURE_VEC_LEN, 200, 200, 1>>> mlps;
@@ -111,7 +114,6 @@ int main(int argc, char *argv[]) {
             if(*expDirIt == std::filesystem::end(*expDirIt)) {
                 if(++dirListIt == expDirList->end()){
                     log.warn("--- No experience left, resetting ---");
-                    std::exit(0);
                     dirListIt = expDirList->begin();
                 }
 
