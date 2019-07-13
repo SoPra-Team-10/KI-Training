@@ -170,7 +170,7 @@ namespace ai{
         switch (next.getTurnType()){
             case communication::messages::types::TurnType::MOVE:
                 log.info("Move requested");
-                return aiTools::computeBestMove(currentState, evalFun, next.getEntityId());
+                return aiTools::computeBestMove(currentState, evalFun, next.getEntityId(), false);
             case communication::messages::types::TurnType::ACTION:{
                 auto type = gameController::getPossibleBallActionType(currentState.env->getPlayerById(next.getEntityId()), currentState.env);
                 if(!type.has_value()){
@@ -179,7 +179,7 @@ namespace ai{
 
                 if(*type == gameController::ActionType::Throw) {
                     log.info("Throw requested");
-                    return aiTools::computeBestShot(currentState, evalFun, next.getEntityId());
+                    return aiTools::computeBestShot(currentState, evalFun, next.getEntityId(), false);
                 } else if(*type == gameController::ActionType::Wrest) {
                     log.info("Wrest requested");
                     return aiTools::computeBestWrest(currentState, evalFun, next.getEntityId());
@@ -191,7 +191,7 @@ namespace ai{
                 return aiTools::getNextFanTurn(currentState, next);
             case communication::messages::types::TurnType::REMOVE_BAN:
                 log.info("Unban requested");
-                return aiTools::redeployPlayer(currentState, evalFun, next.getEntityId());
+                return aiTools::redeployPlayer(currentState, evalFun, next.getEntityId(), false);
             default:
                 throw std::runtime_error("Enum out of bounds");
         }
